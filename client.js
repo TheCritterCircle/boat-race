@@ -82,6 +82,8 @@ class Crosshair extends GameObject {
 class Player extends GameObject {
 	constructor(game,x,y) {
 		super(game,x,y);
+		this.pair = "hello";
+		this.mode = 0;
 		this.graphics.beginFill("DeepSkyBlue").drawCircle(0,0,50);
 		this.speed = .3
 		this.moving = {up:0,down:0,left:0,right:0};
@@ -99,12 +101,10 @@ class Player extends GameObject {
 	}
 
 	update() {
-		if(!(this.moving==0&&this.moving==0)) {
 			this.physics.addImpulse(
 				(this.moving.right-this.moving.left)*this.speed,
-				(this.moving.up-this.moving.down)*this.speed
+				(this.moving.up-this.moving.down/2)*this.speed+.2
 			);
-		}
 		this.physics.update();
 		super.update();
 		this.crosshair.worldX = this.crosshairPos.x;
@@ -113,12 +113,22 @@ class Player extends GameObject {
 	}
 
 	getCrumb() {
-		return {
-			x:this.worldX,
-			y:this.worldY,
-			moving: this.moving,
-			crosshair:this.crosshairPos
-		}
+		switch(this.mode) {
+			case 0:
+				return {
+					pair:this.pair,
+					mode:this.mode,
+					x:this.worldX,
+					y:this.worldY,
+					moving: this.moving
+				}
+			case 1:
+				return {
+					pair:this.pair,
+					mode:this.mode,
+					crosshair:this.crosshairPos
+				}
+			}
 	}
 
 	updateCrumb(p) {
@@ -151,11 +161,10 @@ class Game {
 		this.coins = [];
 
 		//Setup Coins
-		this.coinPos = generateCoins(100,{x:w-200,y:h*5});
+		this.coinPos = generateCoins(100,{x:w-200,y:h*50});
 		for (let i = 0; i < this.coinPos.length; i+=2) {
 			var coin = new Coin(this,this.coinPos[i]+100,this.coinPos[i+1]+w/2);
 			this.coins.push(coin);
-
 		}
 
 		//Setup Events
@@ -174,10 +183,12 @@ class Game {
 	}
 
 	mouseMove(e) {
+		if(this.player.mode!=1) return;
 		this.player.setCrosshairPos(e.stageX,e.stageY);
 	}
 
 	inputDown(e) {
+		if(this.player.mode!=0) return;
 		console.log("INPUT: "+e.keyCode)
 		switch(e.keyCode) {
 			// Up (-X)
