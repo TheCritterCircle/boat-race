@@ -26,6 +26,11 @@ function generateCoins(n, bounds) {
 	return pos;
 }
 
+function centerText (text) {
+var b = text.getBounds();
+	text.x += - (b.width/2); 
+}
+
 class Component {
 	constructor(gameObject) {
 		this.gameObject = { worldX: 0, worldY: 0 };
@@ -76,6 +81,14 @@ class Crosshair extends GameObject {
 	constructor(game, x, y) {
 		super(game, x, y);
 		this.graphics.beginFill("Green").drawCircle(0, 0, 20);
+		this.text = new createjs.Text("Hello World", "15px Arial", "#000000");
+		game.stage.addChild(this.text);
+	}
+	update() {
+		super.update();
+		this.text.x = this.x;
+		this.text.y = this.y + 30;
+		centerText(this.text);
 	}
 }
 
@@ -91,6 +104,8 @@ class Ship extends GameObject {
 
 		//Child GameObjects
 		this.crosshair = new Crosshair(game, 0, 0);
+		this.text = new createjs.Text("Hello World", "15px Arial", "#000000");
+		game.stage.addChild(this.text);
 
 		// Components
 		this.physics = new PhysicsBody(this);
@@ -110,6 +125,10 @@ class Ship extends GameObject {
 		this.crosshair.worldX = this.crosshairPos.x;
 		this.crosshair.worldY = this.worldY - this.crosshairPos.y + this.stage.canvas.height / 2;
 		this.crosshair.update();
+		
+		this.text.x = this.x;
+		this.text.y = this.y + 60;
+		centerText(this.text);
 	}
 
 	getCrumb() {
@@ -143,6 +162,8 @@ class Ship extends GameObject {
 	updateCrumb(p) {
 		p.mode && (this.mode = p.mode);
 		p.name && (this.name = p.name);
+		p.captain && (this.text.text = this.captain = p.captain);
+		p.cannon && (this.crosshair.text.text = this.cannon = p.cannon);
 		p.x && p.y && this.setPos(p.x, p.y);
 		p.moving && (this.moving = p.moving);
 		p.crosshair && (this.crosshairPos = p.crosshair);
@@ -320,3 +341,4 @@ class Game {
 
 game = new Game("viewport", window.innerWidth, window.innerHeight);
 game.login("https://tumble-boat-race.herokuapp.com")
+//game.login("http://localhost:3000")
