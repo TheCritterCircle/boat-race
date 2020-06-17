@@ -57,7 +57,6 @@ class Client {
 		this.bindSocket("moveShip");
 		this.bindSocket("moveCrosshair");
 		console.log("Client Connected: " + socket.id);
-
 		this.room = "game";
 	}
 	
@@ -68,12 +67,12 @@ class Client {
 	disconnect() {
 		if(server.pending&& server.pending.socket.id==this.socket.id) server.pending = undefined;
 		if(this.shipID) {
-			this.emitAll('removeShip',server.ships[this.shipID].getCrumb());
 			if(server.ships[this.shipID].captain.socket.id==this.socket.id) {
-				server.ships[this.shipID].cannon.disconnect()
+				server.pend(server.ships[this.shipID].cannon)
 			} else {
-				server.ships[this.shipID].captain.disconnect;
+				server.pend(server.ships[this.shipID].captain);
 			}
+			this.emitAll('removeShip',server.ships[this.shipID].getCrumb());
 		}
 		delete server.ships[this.shipID]
 		console.log("client disconnected:", this.socket.id);
@@ -103,12 +102,13 @@ class Client {
 			});
 
 		} else {
-			server.pending = this;
+			server.pend(this);
 		}
 	}
 
 	moveShip(m) {
 		console.log(this.socket.id,"moveShip",m)
+		console.log(this)
 		var {x,y,moving} = m;
 		if(!this.shipID) return;
 		server.ships[this.shipID].x = x;
@@ -144,6 +144,13 @@ class Server {
 
 	getShipCrumbs() {
 		return Object.values(this.ships).map(s => s.getCrumb());
+	}
+
+	pend(client) {
+		this.pending = client;
+		client.socket.leave(client.room);
+		client.shipID = undefined;
+		client.socket.emit("pending");
 	}
 }
 

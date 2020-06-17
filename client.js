@@ -61,8 +61,9 @@ class GameObject extends createjs.Shape {
 		super();
 		this.worldX = x;
 		this.worldY = y;
-		this.x = 0;
-		this.y = 0;
+		var pos = game.worldToLocalPos(x, y)
+		this.x = pos.x;
+		this.y = pos.y;
 		game.stage.addChild(this);
 	}
 
@@ -133,7 +134,7 @@ class Ship extends GameObject {
 	update() {
 		this.physics.addImpulse(
 			(this.moving.right - this.moving.left) * this.speed,
-			(this.moving.up - this.moving.down / 2) * this.speed + .2
+			(this.moving.up - this.moving.down / 2) * this.speed// + .2
 		);
 		this.physics.update();
 		super.update();
@@ -232,6 +233,7 @@ class Game {
 		//joinShip
 		socket.on('joinShip',function(shipInfo) {
 			console.log("joinShip",shipInfo);
+			console.log("You are the",(shipInfo.mode==0?"Captain":"Cannon") + "!")
 			game.shipInfo.name = shipInfo.name;
 			game.shipInfo.mode = shipInfo.mode;
 
@@ -241,6 +243,7 @@ class Game {
 		});
 		socket.on('addShip',game.addShip.bind(game));
 		socket.on('removeShip',game.removeShip.bind(game));
+		socket.on('pending',game.reset.bind(game));
 		socket.on('moveShip',function(m) {
 			console.log("moveShip",m);
 			game.ships[m.name].updateCrumb(m);
@@ -251,6 +254,14 @@ class Game {
 		});
 	}
 
+	reset() {
+		console.log("We be finding you a crew...")
+		this.player = undefined;
+		Object.values(this.ships).forEach(ship=>{ship.destroy()});
+		this.ships = {};
+		this.shipInfo = {};
+	}
+
 	addShip(s) {
 		if(game.ships[s.name]) return;
 		console.log("addShip",s);
@@ -259,12 +270,14 @@ class Game {
 		game.ships[ship.name] = ship;
 		if(ship.name == this.shipInfo.name) {
 			ship.mode = this.shipInfo.mode;
+			console.log(this.shipInfo.mode==0?(ship.cannon + ": Aye Aye Captain!"):(ship.captain + ": Ahoy Mateys!"))
 			game.player=ship;
 		}
 	}
 
 	removeShip(s) {
 		console.log("removeShip",s);
+		if(!game.ships[s.name]) return;
 		game.ships[s.name].destroy();
 		delete game.ships[s.name];
 	}
@@ -312,7 +325,7 @@ class Game {
 				break;
 		}
 		var {up,down,left,right} = this.player.moving;
-		if(!(up==0&&down==0&&left==0&&right==0)) this.socket.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
+		if(!(up==0&&down==0&&left==0&&right==0)) this.socket.emit("moveShip",{x:this.player.worldX,y:this.player.worldY,moving:this.player.moving});
 	}
 
 	inputUp(e) {
@@ -347,6 +360,7 @@ class Game {
 	}
 
 	worldToLocalPos(x, y) {
+		if(!game.player) return {x:0,y:0}
 		return {
 			x,
 			y: game.stage.canvas.height / 2 - (y - game.player.worldY) + game.player.physics.velocity.y
@@ -354,6 +368,7 @@ class Game {
 	}
 
 	localToWorldPos(x, y) {
+		if(!game.player) return {x:0,y:0}
 		return {
 			x,
 			y: game.player.worldY + (game.stage.canvas.height / 2 - y - game.player.physics.velocity.y)
@@ -362,5 +377,5 @@ class Game {
 }
 
 game = new Game("viewport", window.innerWidth, window.innerHeight);
-game.login("https://tumble-boat-race.herokuapp.com")
-//game.login("http://localhost:3000")
+//game.login("https://tumble-boat-race.herokuapp.com")
+game.login("http://localhost:3000")
