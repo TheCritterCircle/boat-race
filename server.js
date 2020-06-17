@@ -1,6 +1,7 @@
 "use strict";
 
 const socketIo = require('socket.io');
+const e = require('express');
 var server;
 
 
@@ -66,7 +67,17 @@ class Client {
 
 	disconnect() {
 		if(server.pending&& server.pending.socket.id==this.socket.id) server.pending = undefined;
-		console.log("client disconnected:", this.socket.id);		
+		if(this.shipID) {
+			this.emitAll('removeShip',server.ships[this.shipID].getCrumb());
+			if(server.ships[this.shipID].captain.socket.id==this.socket.id) {
+				server.ships[this.shipID].cannon.disconnect()
+			} else {
+				server.ships[this.shipID].captain.disconnect;
+			}
+		}
+		server.ships.filter(ship=>ship.getID()!==this.shipID)
+		console.log("client disconnected:", this.socket.id);
+
 	}
 	joinGame(nickname) {
 		console.log(this.socket.id,"joinGame",nickname)
