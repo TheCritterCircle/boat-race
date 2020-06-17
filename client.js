@@ -377,5 +377,5 @@ class Game {
 }
 
 game = new Game("viewport", window.innerWidth, window.innerHeight);
-//game.login("https://tumble-boat-race.herokuapp.com")
-game.login("http://localhost:3000")
+game.login("https://tumble-boat-race.herokuapp.com")
+//game.login("http://localhost:3000")
