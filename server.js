@@ -65,6 +65,7 @@ class Client {
 	}
 
 	disconnect() {
+		if(server.pending.socket.id==this.socket.id) server.pending = undefined;
 		console.log("client disconnected:", this.socket.id);		
 	}
 	joinGame(nickname) {
