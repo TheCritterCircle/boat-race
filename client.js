@@ -240,7 +240,7 @@ class Game {
 			}
 		});
 		socket.on('addShip',game.addShip.bind(game));
-		socket.on('removeShip',game.addShip.bind(game));
+		socket.on('removeShip',game.removeShip.bind(game));
 		socket.on('moveShip',function(m) {
 			console.log("moveShip",m);
 			game.ships[m.name].updateCrumb(m);
@@ -264,6 +264,7 @@ class Game {
 	}
 
 	removeShip(s) {
+		console.log("removeShip",s);
 		game.ships[s.name].destroy();
 		delete game.ships[s.name];
 	}
