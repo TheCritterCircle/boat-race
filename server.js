@@ -75,7 +75,7 @@ class Client {
 				server.ships[this.shipID].captain.disconnect;
 			}
 		}
-		server.ships.filter(ship=>ship.getID()!==this.shipID)
+		delete server.ships[this.shipID]
 		console.log("client disconnected:", this.socket.id);
 
 	}

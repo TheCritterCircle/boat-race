@@ -76,6 +76,10 @@ class GameObject extends createjs.Shape {
 		this.worldX = x;
 		this.worldY = y;
 	}
+
+	destroy() {
+		game.stage.removeChild(this);
+	}
 }
 class Crosshair extends GameObject {
 	constructor(game, x, y) {
@@ -89,6 +93,11 @@ class Crosshair extends GameObject {
 		this.text.x = this.x;
 		this.text.y = this.y + 30;
 		centerText(this.text);
+	}
+
+	destroy() {
+		game.stage.removeChild(this.text);
+		super.destroy()
 	}
 }
 
@@ -109,6 +118,12 @@ class Ship extends GameObject {
 
 		// Components
 		this.physics = new PhysicsBody(this);
+	}
+
+	destroy() {
+		this.crosshair.destroy();
+		game.stage.removeChild(this.text);
+		super.destroy()
 	}
 
 	setCrosshairPos(x, y) {
@@ -148,14 +163,14 @@ class Ship extends GameObject {
 					crosshair: this.crosshairPos
 				}
 			default: 
-			 return {
-				 name: this.name,
-				 mode: this.mode,
-				 x: this.worldX,
-				 y: this.worldY,
-				 moving: this.moving,
-				 crosshair: this.crosshairPos
-			 }
+			return {
+				name: this.name,
+				mode: this.mode,
+				x: this.worldX,
+				y: this.worldY,
+				moving: this.moving,
+				crosshair: this.crosshairPos
+			}
 		}
 	}
 
@@ -225,6 +240,7 @@ class Game {
 			}
 		});
 		socket.on('addShip',game.addShip.bind(game));
+		socket.on('removeShip',game.addShip.bind(game));
 		socket.on('moveShip',function(m) {
 			console.log("moveShip",m);
 			game.ships[m.name].updateCrumb(m);
@@ -245,6 +261,11 @@ class Game {
 			ship.mode = this.shipInfo.mode;
 			game.player=ship;
 		}
+	}
+
+	removeShip(s) {
+		game.ships[s.name].destroy();
+		delete game.ships[s.name];
 	}
 
 
