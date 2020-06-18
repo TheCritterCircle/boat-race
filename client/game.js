@@ -120,7 +120,7 @@ class Player extends GameObject {
 			(this.moving.right - this.moving.left) * this.speed,
 			( this.moving.down / 2 - this.moving.up) * this.speed// - .2
 		);
-		if(this.mode==1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
+		if(this.mode==1||this.mode==-1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
 
 		this.physics.update();
 		this.y += this.ship.y;
@@ -286,6 +286,18 @@ class Room extends createjs.Container {
 	}
 }
 
+class HUD extends createjs.Container {
+	constructor(game) {
+		super();
+		this.text = new createjs.Text("Hud Test", "100px Arial", "#000000");
+		this.addChild(this.text);
+	}
+
+	update() {
+
+	}
+}
+
 class Game {
 	constructor(i, w, h) {
 		//Setup Stage
@@ -301,6 +313,8 @@ class Game {
 		//Setup Game Objects
 		this.room = new Room(this);
 		this.stage.addChild(this.room);
+		this.hud = new HUD(this);
+		this.stage.addChild(this.hud);
 
 		//Attributes
 		this.shipInfo = {};

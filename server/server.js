@@ -270,7 +270,7 @@ class Client {
 		ship.x = x;
 		ship.y = y;
 		ship.moving = moving;
-		if(room.sixe.h-room.start>y){
+		if(room.size.h-room.start>y){
 			//Start Racve
 			room.started = true;
 			room.emit(this,'raceStart',{name:this.ship,x,y,moving});
