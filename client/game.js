@@ -183,6 +183,15 @@ class Coin extends GameObject {
 	}
 }
 
+class Room extends createjs.Container {
+	constructor() {
+		super();
+		this.background = new createjs.Bitmap("media/background.png");
+		this.addChild(this.background);
+		this.roomSize = {w:1920,h:5550};
+	}
+}
+
 class Game {
 	constructor(i, w, h) {
 		//Setup Stage
@@ -195,14 +204,11 @@ class Game {
 		createjs.Ticker.addEventListener("tick", this.update.bind(this));
 
 		this.viewSize = {w,h};
-		this.roomSize = {w:1920,h:5550};
 		this.startY = this.roomSize.h-h/2;
 
 		//Setup Game Objects
 		this.room = new createjs.Container();
 		this.stage.addChild(this.room);
-		this.background = new createjs.Bitmap("media/background.png");
-		this.addChild(this.background);
 
 		//Ships
 		this.ships = {}

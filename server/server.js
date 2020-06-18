@@ -181,6 +181,8 @@ class Ship {
 		this.cannon.join(room.name);
 		this.captain.room = room.name;
 		this.cannon.room = room.name;
+		this.x = room.size.w/2;
+		this.y = room.size.h-100;
 		this.captain.emit('joinShip', {
 			name: this.name,
 			mode: 0,
@@ -191,8 +193,6 @@ class Ship {
 			mode: 1,
 			ships: room.getShips()
 		});
-		this.x = room.size.w/2;
-		this.y = room.size.h-100;
 		console.log(this.name,"has joined",room.name);
 	}
 
