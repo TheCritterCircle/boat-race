@@ -103,6 +103,8 @@ class Room {
 		this.name = ship.name + "-room";
 		this.started = false;
 		this.ships = {};
+		
+		this.size = {w:1920,h:5550};
 
 		console.log("Room Created:",this.name);
 	}
@@ -189,6 +191,8 @@ class Ship {
 			mode: 1,
 			ships: room.getShips()
 		});
+		this.x = room.size.w/2;
+		this.y = room.size.h-100;
 		console.log(this.name,"has joined",room.name);
 	}
 

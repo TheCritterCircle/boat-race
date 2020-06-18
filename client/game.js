@@ -1,7 +1,6 @@
 const
 	ZERO_VECTOR = { x: 0, y: 0 }
-DEBUG = true,
-MULTIPLYAER = true;
+DEBUG = true
 {
 	var oldLog = console.log;
 	console.log = (...data) => {
@@ -75,8 +74,8 @@ class GameObject extends createjs.Container {
 }
 
 class Player extends GameObject {
-	constructor(game,name) {
-		super(game);
+	constructor(game,name,x=0,y=0) {
+		super(game,x,y);
 		this.name = name;
 		this.mode = -1;
 		this.speed = .3
@@ -196,22 +195,18 @@ class Game {
 		createjs.Ticker.addEventListener("tick", this.update.bind(this));
 
 		this.viewSize = {w,h};
-		this.roomSize = {w:1920,h:93700};
-		this.startY = this.roomSize.h-w/2;
+		this.roomSize = {w:1920,h:5550};
+		this.startY = this.roomSize.h-h/2;
 
 		//Setup Game Objects
 		this.room = new createjs.Container();
 		this.stage.addChild(this.room);
+		this.background = new createjs.Bitmap("media/background.png");
+		this.addChild(this.background);
 
 		//Ships
 		this.ships = {}
 		this.shipInfo = {};
-		if(!MULTIPLYAER) {
-			this.player = new Player(this)
-			this.player.setPos(w / 2, this.startY);
-			this.addChild(this.player);
-			this.ships.push(player);
-		}
 
 		//Setup Coins
 		this.coins = [];
@@ -311,13 +306,20 @@ class Game {
 		this.stage.canvas.height = window.innerHeight
 
 		if(this.player) {
-			//this.player.update();
 			Object.values(this.ships).forEach(ship => { ship.update() })
+			//this.room.x = -this.player.x;
+			this.room.x = this.stage.canvas.width/2-this.roomSize.w/2
 			this.room.y = this.viewSize.h/2-this.player.y;
+
+			var minY = this.stage.canvas.height-this.roomSize.h;
+			if(this.room.y<=minY) {
+				this.room.y = minY;
+			} else if(this.room.y>=0) {
+				this.room.y = 0;
+			}
 		}
 		this.coins.forEach(coin => { coin.update() })
 
-		//this.room.x = -this.player.x;
 
 		this.stage.update();
 	}
