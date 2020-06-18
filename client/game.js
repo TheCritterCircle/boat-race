@@ -230,6 +230,7 @@ class Room extends createjs.Container {
 	}
 
 	reset() {
+		game.hud.starting.visible = true;
 		console.log("We be finding you a crew...")
 		this.player = undefined;
 		Object.values(this.ships).forEach(ship=>{ship.destroy()});
@@ -238,6 +239,7 @@ class Room extends createjs.Container {
 	}
 
 	joinShip(shipInfo) {
+		game.hud.starting.visible = false
 		console.log("joinShip",shipInfo);
 		console.log("You are the",(shipInfo.mode==0?"Captain":"Cannon") + "!")
 		game.shipInfo.name = shipInfo.name;
@@ -289,8 +291,13 @@ class Room extends createjs.Container {
 class HUD extends createjs.Container {
 	constructor(game) {
 		super();
-		this.text = new createjs.Text("Hud Test", "100px Arial", "#000000");
-		this.addChild(this.text);
+		this.starting = new createjs.Container();
+		this.addChild(this.starting);
+		this.text = new createjs.Text("Waiting for 1 more player", "bold 50px Arial", "#ffffff");
+		this.starting.addChild(this.text);
+		this.outline = new createjs.Text("Waiting for 1 more player", "bold 50px Arial", "#000");
+		this.starting.addChild(this.outline);
+		this.outline.outline = 3
 	}
 
 	update() {
