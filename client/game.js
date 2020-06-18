@@ -8,8 +8,6 @@ DEBUG = true
 	}
 }
 
-var game;
-
 function lerpXY(a, b, t) {
 	return {
 		x: a.x + t * (b.x - a.x),
@@ -223,7 +221,11 @@ class Game {
 		this.stage.on("stagemousemove", this.mouseMove.bind(this));
 	}
 
-	login(ip) {
+	emit(...a) {
+		this.socket.emit(...a);
+	}
+
+	join(ip) {
 		var socket = io(ip);
 		this.socket = socket;
 		//connect
@@ -246,6 +248,7 @@ class Game {
 		socket.on('pending',game.reset.bind(game));
 		socket.on('moveShip',function(m) {
 			console.log("moveShip",m);
+			if(m.name == game.player.name&&game.player.mode ==0) return;
 			game.ships[m.name].updateCrumb(m);
 		});
 		socket.on('moveCrosshair',function(c) {
@@ -296,7 +299,7 @@ class Game {
 	mouseMove(e) {
 		if (!this.player||this.player.mode != 1) return;
 		this.player.setCrosshairPos(e.stageX, e.stageY);
-		this.socket.emit("moveCrosshair",this.player.crosshairPos);
+		this.emit("moveCrosshair",this.player.crosshairPos);
 	}
 
 	inputDown(e) {
@@ -325,7 +328,7 @@ class Game {
 				break;
 		}
 		var {up,down,left,right} = this.player.moving;
-		if(!(up==0&&down==0&&left==0&&right==0)) this.socket.emit("moveShip",{x:this.player.worldX,y:this.player.worldY,moving:this.player.moving});
+		if(!(up==0&&down==0&&left==0&&right==0)) this.emit("moveShip",{x:this.player.worldX,y:this.player.worldY,moving:this.player.moving});
 	}
 
 	inputUp(e) {
@@ -336,25 +339,25 @@ class Game {
 			case 38: // UP ARROW
 			case 87: // W
 				this.player.moving.up = 0;
-				this.socket.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
+				this.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
 				break;
 			// Left (-Y)
 			case 37: // Left Arrow
 			case 65: // A
 				this.player.moving.left = 0;
-				this.socket.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
+				this.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
 				break;
 			// Down (+Y)
 			case 40: // Down Arrow
 			case 83: // S
 				this.player.moving.down = 0;
-				this.socket.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
+				this.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
 				break;
 			// Right (+X)
 			case 39: // Right Arrow
 			case 68: // D
 				this.player.moving.right = 0;
-				this.socket.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
+				this.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
 				break;
 		}
 	}
@@ -375,7 +378,3 @@ class Game {
 		}
 	}
 }
-
-game = new Game("viewport", window.innerWidth, window.innerHeight);
-game.login("https://tumble-boat-race.herokuapp.com")
-//game.login("http://localhost:3000")

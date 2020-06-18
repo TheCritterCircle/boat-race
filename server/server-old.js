@@ -47,6 +47,29 @@ class Ship {
 	}
 }
 
+class Room {
+	constructor(i) {
+		this.name = i;
+		this.started = false;
+		this.ships = {};
+	}
+
+	start() {
+		this.started = true;
+	}
+
+	pend(client) {
+		this.pending = client;
+		client.socket.leave(client.room);
+		client.shipID = undefined;
+		client.socket.emit("pending");
+	}
+
+	getShipCrumbs() {
+		return Object.values(this.ships).map(s => s.getCrumb());
+	}
+}
+
 class Client {
 	constructor(socket) {
 		this.socket = socket;
@@ -132,25 +155,13 @@ class Server {
 	constructor(server) {
 		this.io = socketIo.listen(server);
 		this.clients = [];
-		this.ships = {};
 
 		this.io.on('connect', this.clientConnected.bind(this));
-		console.log("Created Server " + this.io.id);
+		console.log("Created Server " + this.io.);
 	}
 
 	clientConnected(socket) {
 		this.clients.push(new Client(socket));
-	}
-
-	getShipCrumbs() {
-		return Object.values(this.ships).map(s => s.getCrumb());
-	}
-
-	pend(client) {
-		this.pending = client;
-		client.socket.leave(client.room);
-		client.shipID = undefined;
-		client.socket.emit("pending");
 	}
 }
 
