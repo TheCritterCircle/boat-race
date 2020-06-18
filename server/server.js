@@ -125,8 +125,11 @@ class Room {
 		this.emit(client,"addShip",ship.getCrumb())
 	}
 	removeShip(client,ship) {
+		var name = ship.name;
 		this.emit(client,'removeShip',ship.getCrumb());
+		this.ships[ship.name] = undefined;
 		delete this.ships[ship.name];
+		console.log("removed ship",name)
 	}
 }
 
@@ -177,6 +180,7 @@ class Ship {
 	}
 
 	join(room) {
+		this.room = room.name;
 		this.captain.join(room.name);
 		this.cannon.join(room.name);
 		this.captain.room = room.name;
@@ -204,8 +208,8 @@ class Ship {
 			this.captain.reset();
 			server.requestShip(this.captain);
 		}
-		if(this.room) this.getRoom().removeShip(client,this);
 		console.log("Ship destroyed",this.name);
+		this.getRoom().removeShip(client,this);
 	}
 
 }

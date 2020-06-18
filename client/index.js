@@ -6,13 +6,13 @@ if(MULTIPLAYER) {
 	game.join(location.hostname=="localhost"?"http://localhost:3000":"https://tumble-boat-race.herokuapp.com")
 game.emit("joinGame",prompt("Username"));
 } else {
-	game.joinShip({
+	game.room.joinShip({
 		name:"local",
 		mode:-1,
 		ships: [{
 			name: "local",
-			x: game.roomSize.w/2,
-			y: game.roomSize.h-100,
+			x: game.room.size.w/2,
+			y: game.room.size.h-100,
 			moving:  {
 				up: 0,
 				down: 0,

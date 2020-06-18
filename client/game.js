@@ -68,6 +68,10 @@ class GameObject extends createjs.Container {
 		this.y = y;
 	}
 
+	getPos() {
+		return{x:this.x,y:this.y}
+	}
+
 	destroy() {
 		this.parent.removeChild(this);
 	}
@@ -111,28 +115,28 @@ class Player extends GameObject {
 		this.physics = new PhysicsBody(this.ship);
 	}
 
-	setCrosshairPos(x, y) {
-		this.crosshair.x = x;
-		this.crosshair.y = y;
-	}
-
-	setPos(x,y) {
-		this.ship.x = x;
-		this.y = y;
-	}
-
 	update() {
 		this.physics.addImpulse(
 			(this.moving.right - this.moving.left) * this.speed,
-			( this.moving.down / 2 - this.moving.up) * this.speed// + .2
+			( this.moving.down / 2 - this.moving.up) * this.speed// - .2
 		);
+		if(this.mode==1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
+
 		this.physics.update();
 		this.y += this.ship.y;
 		this.ship.y = 0;
+		this.x += this.ship.x;
+		this.ship.x = 0;
+	}
+
+	setCrosshairPos(x, y) {
+		var mouse = this.globalToLocal(x,y);
+		this.crosshair.x = mouse.x;
+		this.crosshair.y = mouse.y;
 	}
 
 	getCrosshairPos() {
-		return {x:this.crosshair.x,y:this.crosshair.y}
+		return this.localToGlobal(this.crosshair.x,this.crosshair.y);
 	}
 
 	getCrumb() {
@@ -184,80 +188,45 @@ class Coin extends GameObject {
 }
 
 class Room extends createjs.Container {
-	constructor() {
+	constructor(game) {
 		super();
 		this.background = new createjs.Bitmap("media/background.png");
 		this.addChild(this.background);
-		this.roomSize = {w:1920,h:5550};
-	}
-}
 
-class Game {
-	constructor(i, w, h) {
-		//Setup Stage
-		this.stage = new createjs.Stage(i);
-		this.stage.canvas.width = w;
-		this.stage.canvas.height = h;
-
-		//Setup Game Loop
-		createjs.Ticker.setFPS(60);
-		createjs.Ticker.addEventListener("tick", this.update.bind(this));
-
-		this.viewSize = {w,h};
-		this.startY = this.roomSize.h-h/2;
-
-		//Setup Game Objects
-		this.room = new createjs.Container();
-		this.stage.addChild(this.room);
-
-		//Ships
+		//Properies
+		this.size = {w:1920,h:5550};
+		var screen = game.getSize();
+		this.startY = this.size.h-screen.h/2;
 		this.ships = {}
-		this.shipInfo = {};
+	}
 
-		//Setup Coins
-		this.coins = [];
-		this.coinPos = generateCoins(100, { x: this.roomSize.w - 200, y: this.roomSize.h });
-		for (let i = 0; i < this.coinPos.length; i += 2) {
-			var coin = new Coin(this, this.coinPos[i] + 100, this.coinPos[i + 1] + w / 2);
-			this.addChild(coin);
-			this.coins.push(coin);
+	bind(action,ret) {
+		if(ret) {
+			return this[action].bind(this);
 		}
-
-		//Setup Events
-		window.onkeydown = this.inputDown.bind(this);
-		window.onkeyup = this.inputUp.bind(this);
-		this.stage.on("stagemousemove", this.mouseMove.bind(this));
+		game.on(action,this[action].bind(this));
 	}
 
-	emit(...a) {
-		this.socket&&(this.socket.emit(...a));
-	}
-	
-	addChild(o) {
-		this.room.addChild(o);
-	}
+	update() {
+		Object.values(this.ships).forEach(ship => { ship.update() })
 
-	removeChild(o) {
-		this.room.removeChild(o);
-	}
+		var screen = game.getSize();
+		var playerPos = game.player.getPos();
+		this.x = screen.w/2-playerPos.x;
+		this.y = screen.h/2-playerPos.y;
 
-	join(ip) {
-		var socket = io(ip);
-		this.socket = socket;
-		//connect
-		socket.on('connect',function(){
-			console.log("Connected to server")
-		});
-		//joinShip
-		socket.on('joinShip',game.joinShip.bind(game));
-		socket.on('addShip',game.addShip.bind(game));
-		socket.on('removeShip',game.removeShip.bind(game));
-		socket.on('pending',game.reset.bind(game));
-		socket.on('moveShip',game.moveShip.bind(game));
-		socket.on('moveCrosshair',function(c) {
-			console.log("moveCrosshair",c);
-			game.ships[c.name].updateCrumb(c);
-		});
+		var minY = screen.h-this.size.h;
+		var minW = screen.w-this.size.w;
+		if(this.y<minY) {
+			this.y = minY;
+		} else if(this.y>0) {
+			this.y = 0;
+		}
+		if(this.x<minW) {
+			this.x = minW;
+		} else if(this.x>-minW) {
+			this.x = -minW;
+		}
 	}
 
 	reset() {
@@ -275,25 +244,30 @@ class Game {
 		game.shipInfo.mode = shipInfo.mode;
 
 		for(var i in shipInfo.ships) {
-			game.addShip(shipInfo.ships[i])
+			this.addShip(shipInfo.ships[i])
 		}
 	}
 
 	moveShip(m) {
 		console.log("moveShip",m);
 		if(m.name == game.player.name&&game.player.mode ==0) return;
-		game.ships[m.name].updateCrumb(m);
+		this.ships[m.name].updateCrumb(m);
+	}
+
+	moveCrosshair(c) {
+		console.log("moveCrosshair",c);
+		this.ships[c.name].updateCrumb(c);
 	}
 
 	addShip(s) {
-		if(game.ships[s.name]) return;
+		if(this.ships[s.name]) return;
 		console.log("addShip",s);
 		var ship = new Player(this, s.name);
 		ship.updateCrumb(s);
-		game.ships[ship.name] = ship;
-		if(ship.name == this.shipInfo.name) {
-			ship.mode = this.shipInfo.mode;
-			console.log(this.shipInfo.mode==0?(ship.cannon + ": Aye Aye Captain!"):(ship.captain + ": Ahoy Mateys!"))
+		this.ships[ship.name] = ship;
+		if(ship.name == game.shipInfo.name) {
+			ship.mode = game.shipInfo.mode;
+			console.log(game.shipInfo.mode==0?(ship.cannon + ": Aye Aye Captain!"):(ship.captain + ": Ahoy Mateys!"))
 			game.player=ship;
 		}
 		this.addChild(ship);
@@ -301,38 +275,85 @@ class Game {
 
 	removeShip(s) {
 		console.log("removeShip",s);
-		if(!game.ships[s.name]) return;
-		game.ships[s.name].destroy();
-		delete game.ships[s.name];
+		if(!this.ships[s.name]) return;
+		this.ships[s.name].destroy();
+		delete this.ships[s.name];
+	}
+}
+
+class Game {
+	constructor(i, w, h) {
+		//Setup Stage
+		this.stage = new createjs.Stage(i);
+		this.stage.canvas.width = w;
+		this.stage.canvas.height = h;
+		//this.stage.canvas.style.cursor = "none";
+
+		//Setup Game Loop
+		createjs.Ticker.setFPS(60);
+		createjs.Ticker.addEventListener("tick", this.update.bind(this));
+
+		//Setup Game Objects
+		this.room = new Room(this);
+		this.stage.addChild(this.room);
+
+		//Attributes
+		this.shipInfo = {};
+
+		//Setup Events
+		window.onkeydown = this.inputDown.bind(this);
+		window.onkeyup = this.inputUp.bind(this);
+		this.stage.on("stagemousemove", this.mouseMove.bind(this));
+	}
+
+	getSize() {
+		return {
+			w:this.stage.canvas.width,
+			h:this.stage.canvas.height
+		}
+	}
+
+	//Socket Utils
+	emit(...a) {
+		this.socket&&(this.socket.emit(...a));
+	}
+
+	on(...a) {
+		this.socket&&(this.socket.on(...a))
 	}
 
 
+	join(ip) {
+		var socket = io(ip);
+		this.socket = socket;
+		//connect
+		socket.on('connect',function(){
+			console.log("Connected to server")
+		});
+		//joinShip
+		var room = this.room;
+		room.bind('joinShip');
+		room.bind('addShip');
+		room.bind('removeShip');
+		socket.on('pending',room.bind('reset',true));
+		room.bind('moveShip');
+		room.bind('moveCrosshair');
+	}
+
+
+	//events
 	update(e) {
 		this.stage.canvas.width = window.innerWidth;
 		this.stage.canvas.height = window.innerHeight
-
-		if(this.player) {
-			Object.values(this.ships).forEach(ship => { ship.update() })
-			//this.room.x = -this.player.x;
-			this.room.x = this.stage.canvas.width/2-this.roomSize.w/2
-			this.room.y = this.viewSize.h/2-this.player.y;
-
-			var minY = this.stage.canvas.height-this.roomSize.h;
-			if(this.room.y<=minY) {
-				this.room.y = minY;
-			} else if(this.room.y>=0) {
-				this.room.y = 0;
-			}
-		}
-		this.coins.forEach(coin => { coin.update() })
-
-
+		this.player&&this.room.update();
 		this.stage.update();
 	}
 
 	mouseMove(e) {
 		if (!this.player||(this.player.mode != 1&&this.player.mode != -1)) return;
-		this.player.setCrosshairPos(e.stageX, e.stageY-game.viewSize.h/2);
+		//this.player.setCrosshairPos(e.stageX-game.getSize().w/2, e.stageY-game.getSize().h/2);
+
+		this.player.setCrosshairPos(e.stageX, e.stageY);
 		this.emit("moveCrosshair",this.player.getCrosshairPos());
 	}
 
