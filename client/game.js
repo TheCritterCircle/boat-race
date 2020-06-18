@@ -1,6 +1,7 @@
 const
 	ZERO_VECTOR = { x: 0, y: 0 }
-DEBUG = true
+DEBUG = true,
+MULTIPLYAER = true;
 {
 	var oldLog = console.log;
 	console.log = (...data) => {
@@ -44,8 +45,8 @@ class PhysicsBody extends Component {
 	}
 
 	update() {
-		this.gameObject.worldX += this.velocity.x;
-		this.gameObject.worldY += this.velocity.y;
+		this.gameObject.x += this.velocity.x;
+		this.gameObject.y += this.velocity.y;
 		this.velocity = lerpXY(this.velocity, ZERO_VECTOR, this.dampening);
 	}
 	addImpulse(x, y) {
@@ -54,95 +55,85 @@ class PhysicsBody extends Component {
 	}
 }
 
-class GameObject extends createjs.Shape {
+class GameObject extends createjs.Container {
 	constructor(game, x=0, y=0) {
 		super();
-		this.worldX = x;
-		this.worldY = y;
-		var pos = game.worldToLocalPos(x, y)
-		this.x = pos.x;
-		this.y = pos.y;
-		game.stage.addChild(this);
+		this.x = x;
+		this.y = y;
 	}
 
-	update() {
-		var pos = game.worldToLocalPos(this.worldX, this.worldY)
-		this.x = pos.x;
-		this.y = pos.y;
-	}
+	update() {}
 
 	setPos(x, y) {
-		this.worldX = x;
-		this.worldY = y;
+		this.x = x;
+		this.y = y;
 	}
 
 	destroy() {
-		game.stage.removeChild(this);
-	}
-}
-class Crosshair extends GameObject {
-	constructor(game, x, y) {
-		super(game, x, y);
-		this.graphics.beginFill("Green").drawCircle(0, 0, 20);
-		this.text = new createjs.Text("Hello World", "15px Arial", "#000000");
-		game.stage.addChild(this.text);
-	}
-	update() {
-		super.update();
-		this.text.x = this.x;
-		this.text.y = this.y + 30;
-		centerText(this.text);
-	}
-
-	destroy() {
-		game.stage.removeChild(this.text);
-		super.destroy()
+		this.parent.removeChild(this);
 	}
 }
 
-class Ship extends GameObject {
+class Player extends GameObject {
 	constructor(game,name) {
 		super(game);
 		this.name = name;
 		this.mode = -1;
-		this.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
 		this.speed = .3
 		this.moving = { up: 0, down: 0, left: 0, right: 0 };
-		this.crosshairPos = { x: 0, y: 0 };
 
-		//Child GameObjects
-		this.crosshair = new Crosshair(game, 0, 0);
-		this.text = new createjs.Text("Hello World", "15px Arial", "#000000");
-		game.stage.addChild(this.text);
+		//Ship
+		this.ship = new createjs.Container();
+		this.addChild(this.ship);
+		//Graphic
+			this.shipGraphic = new createjs.Shape();
+			this.ship.addChild(this.shipGraphic);
+			this.shipGraphic.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
+		//Nickname
+			this.captainNickname = new createjs.Text("Captain", "15px Arial", "#000000");
+			this.ship.addChild(this.captainNickname);
+			this.captainNickname.y = 50;
+			centerText(this.captainNickname);
+
+		//Crosshair
+		this.crosshair = new createjs.Container();
+		this.addChild(this.crosshair);
+		//Graphic
+			this.crosshairGraphic = new createjs.Shape();
+			this.crosshairGraphic.graphics.beginFill("Green").drawCircle(0, 0, 20);
+			this.crosshair.addChild(this.crosshairGraphic);
+		//Nickname
+			this.cannonNickname = new createjs.Text("Cannon", "15px Arial", "#000000");
+			this.crosshair.addChild(this.cannonNickname);
+			this.cannonNickname.y = 20;
+			centerText(this.cannonNickname)
 
 		// Components
-		this.physics = new PhysicsBody(this);
-	}
-
-	destroy() {
-		this.crosshair.destroy();
-		game.stage.removeChild(this.text);
-		super.destroy()
+		this.physics = new PhysicsBody(this.ship);
 	}
 
 	setCrosshairPos(x, y) {
-		this.crosshairPos = { x, y };
+		this.crosshair.x = x;
+		this.crosshair.y = y;
+	}
+
+	setPos(x,y) {
+		this.ship.x = x;
+		this.y = y;
 	}
 
 	update() {
 		this.physics.addImpulse(
 			(this.moving.right - this.moving.left) * this.speed,
-			(this.moving.up - this.moving.down / 2) * this.speed// + .2
+			( this.moving.down / 2 - this.moving.up) * this.speed// + .2
 		);
 		this.physics.update();
-		super.update();
-		this.crosshair.worldX = this.crosshairPos.x;
-		this.crosshair.worldY = this.worldY - this.crosshairPos.y + this.stage.canvas.height / 2;
-		this.crosshair.update();
-		
-		this.text.x = this.x;
-		this.text.y = this.y + 60;
-		centerText(this.text);
+		this.y += this.ship.y;
+		this.ship.y = 0;
+	}
+
+	getCrosshairPos() {
+		return {x:this.crosshair.x,y:this.crosshair.y}
 	}
 
 	getCrumb() {
@@ -151,24 +142,24 @@ class Ship extends GameObject {
 				return {
 					name: this.name,
 					mode: this.mode,
-					x: this.worldX,
-					y: this.worldY,
+					x: this.ship.x,
+					y: this.y,
 					moving: this.moving
 				}
 			case 1:
 				return {
 					name: this.name,
 					mode: this.mode,
-					crosshair: this.crosshairPos
+					crosshair: this.getCrosshairPos()
 				}
 			default: 
 			return {
 				name: this.name,
 				mode: this.mode,
-				x: this.worldX,
-				y: this.worldY,
+				x: this.ship.x,
+				y: this.y,
 				moving: this.moving,
-				crosshair: this.crosshairPos
+				crosshair: this.getCrosshairPos()
 			}
 		}
 	}
@@ -176,18 +167,20 @@ class Ship extends GameObject {
 	updateCrumb(p) {
 		p.mode && (this.mode = p.mode);
 		p.name && (this.name = p.name);
-		p.captain && (this.text.text = this.captain = p.captain);
-		p.cannon && (this.crosshair.text.text = this.cannon = p.cannon);
+		p.captain && (this.captainNickname.text = this.captain = p.captain)&&centerText(this.captainNickname);
+		p.cannon && (this.cannonNickname.text = this.cannon = p.cannon)&&centerText(this.cannonNickname);
 		p.x && p.y && this.setPos(p.x, p.y);
 		p.moving && (this.moving = p.moving);
-		p.crosshair && (this.crosshairPos = p.crosshair);
+		p.crosshair && this.setCrosshairPos(p.crosshair.x,p.crosshair.y);
 	}
 }
 
 class Coin extends GameObject {
 	constructor(game, x, y) {
 		super(game, x, y);
-		this.graphics.beginFill("Yellow").drawCircle(0, 0, 25);
+		this.coinGraphic = new createjs.Shape();
+		this.coinGraphic.graphics.beginFill("Yellow").drawCircle(0, 0, 25);
+		this.addChild(this.coinGraphic);
 	}
 }
 
@@ -202,18 +195,32 @@ class Game {
 		createjs.Ticker.setFPS(60);
 		createjs.Ticker.addEventListener("tick", this.update.bind(this));
 
+		this.viewSize = {w,h};
+		this.roomSize = {w:1920,h:93700};
+		this.startY = this.roomSize.h-w/2;
+
 		//Setup Game Objects
+		this.room = new createjs.Container();
+		this.stage.addChild(this.room);
+
+		//Ships
 		this.ships = {}
 		this.shipInfo = {};
-		/*this.player = new Ship(this, w / 2, 0);
-		this.coins = [];
+		if(!MULTIPLYAER) {
+			this.player = new Player(this)
+			this.player.setPos(w / 2, this.startY);
+			this.addChild(this.player);
+			this.ships.push(player);
+		}
 
 		//Setup Coins
-		this.coinPos = generateCoins(100, { x: w - 200, y: h * 50 });
+		this.coins = [];
+		this.coinPos = generateCoins(100, { x: this.roomSize.w - 200, y: this.roomSize.h });
 		for (let i = 0; i < this.coinPos.length; i += 2) {
 			var coin = new Coin(this, this.coinPos[i] + 100, this.coinPos[i + 1] + w / 2);
+			this.addChild(coin);
 			this.coins.push(coin);
-		}*/
+		}
 
 		//Setup Events
 		window.onkeydown = this.inputDown.bind(this);
@@ -222,7 +229,15 @@ class Game {
 	}
 
 	emit(...a) {
-		this.socket.emit(...a);
+		this.socket&&(this.socket.emit(...a));
+	}
+	
+	addChild(o) {
+		this.room.addChild(o);
+	}
+
+	removeChild(o) {
+		this.room.removeChild(o);
 	}
 
 	join(ip) {
@@ -233,24 +248,11 @@ class Game {
 			console.log("Connected to server")
 		});
 		//joinShip
-		socket.on('joinShip',function(shipInfo) {
-			console.log("joinShip",shipInfo);
-			console.log("You are the",(shipInfo.mode==0?"Captain":"Cannon") + "!")
-			game.shipInfo.name = shipInfo.name;
-			game.shipInfo.mode = shipInfo.mode;
-
-			for(var i in shipInfo.ships) {
-				game.addShip(shipInfo.ships[i])
-			}
-		});
+		socket.on('joinShip',game.joinShip.bind(game));
 		socket.on('addShip',game.addShip.bind(game));
 		socket.on('removeShip',game.removeShip.bind(game));
 		socket.on('pending',game.reset.bind(game));
-		socket.on('moveShip',function(m) {
-			console.log("moveShip",m);
-			if(m.name == game.player.name&&game.player.mode ==0) return;
-			game.ships[m.name].updateCrumb(m);
-		});
+		socket.on('moveShip',game.moveShip.bind(game));
 		socket.on('moveCrosshair',function(c) {
 			console.log("moveCrosshair",c);
 			game.ships[c.name].updateCrumb(c);
@@ -265,10 +267,27 @@ class Game {
 		this.shipInfo = {};
 	}
 
+	joinShip(shipInfo) {
+		console.log("joinShip",shipInfo);
+		console.log("You are the",(shipInfo.mode==0?"Captain":"Cannon") + "!")
+		game.shipInfo.name = shipInfo.name;
+		game.shipInfo.mode = shipInfo.mode;
+
+		for(var i in shipInfo.ships) {
+			game.addShip(shipInfo.ships[i])
+		}
+	}
+
+	moveShip(m) {
+		console.log("moveShip",m);
+		if(m.name == game.player.name&&game.player.mode ==0) return;
+		game.ships[m.name].updateCrumb(m);
+	}
+
 	addShip(s) {
 		if(game.ships[s.name]) return;
 		console.log("addShip",s);
-		var ship = new Ship(this, s.name);
+		var ship = new Player(this, s.name);
 		ship.updateCrumb(s);
 		game.ships[ship.name] = ship;
 		if(ship.name == this.shipInfo.name) {
@@ -276,6 +295,7 @@ class Game {
 			console.log(this.shipInfo.mode==0?(ship.cannon + ": Aye Aye Captain!"):(ship.captain + ": Ahoy Mateys!"))
 			game.player=ship;
 		}
+		this.addChild(ship);
 	}
 
 	removeShip(s) {
@@ -290,20 +310,26 @@ class Game {
 		this.stage.canvas.width = window.innerWidth;
 		this.stage.canvas.height = window.innerHeight
 
-		//if(this.player) this.player.update();
-		if(this.player) Object.values(this.ships).forEach(ship => { ship.update() })
-		//this.coins.forEach(coin => { coin.update() })
+		if(this.player) {
+			//this.player.update();
+			Object.values(this.ships).forEach(ship => { ship.update() })
+			this.room.y = this.viewSize.h/2-this.player.y;
+		}
+		this.coins.forEach(coin => { coin.update() })
+
+		//this.room.x = -this.player.x;
+
 		this.stage.update();
 	}
 
 	mouseMove(e) {
-		if (!this.player||this.player.mode != 1) return;
-		this.player.setCrosshairPos(e.stageX, e.stageY);
-		this.emit("moveCrosshair",this.player.crosshairPos);
+		if (!this.player||(this.player.mode != 1&&this.player.mode != -1)) return;
+		this.player.setCrosshairPos(e.stageX, e.stageY-game.viewSize.h/2);
+		this.emit("moveCrosshair",this.player.getCrosshairPos());
 	}
 
 	inputDown(e) {
-		if (!this.player||this.player.mode != 0) return;
+		if (!this.player||(this.player.mode != 0&&this.player.mode !=-1)) return;
 		console.log("INPUT: " + e.keyCode)
 		switch (e.keyCode) {
 			// Up (-X)
@@ -359,22 +385,6 @@ class Game {
 				this.player.moving.right = 0;
 				this.emit("moveShip",{x:this.player.x,y:this.player.y,moving:this.player.moving});
 				break;
-		}
-	}
-
-	worldToLocalPos(x, y) {
-		if(!game.player) return {x:0,y:0}
-		return {
-			x,
-			y: game.stage.canvas.height / 2 - (y - game.player.worldY) + game.player.physics.velocity.y
-		}
-	}
-
-	localToWorldPos(x, y) {
-		if(!game.player) return {x:0,y:0}
-		return {
-			x,
-			y: game.player.worldY + (game.stage.canvas.height / 2 - y - game.player.physics.velocity.y)
 		}
 	}
 }

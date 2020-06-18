@@ -167,7 +167,10 @@ class Ship {
 	}
 	
 	getRoom() {
-		if(!this.room) throw "Ship is not in a room";;
+		if(!this.room) {
+			console.warn("Ship is not in a room");
+			return;
+		}
 		return server.rooms[this.room];
 	}
 
@@ -197,8 +200,8 @@ class Ship {
 			this.captain.reset();
 			server.requestShip(this.captain);
 		}
-		this.getRoom().removeShip(client,this);
-		console.log("Ship destroyed",name);
+		if(this.room) this.getRoom().removeShip(client,this);
+		console.log("Ship destroyed",this.name);
 	}
 
 }
@@ -223,11 +226,17 @@ class Client {
 		this.socket.on(name,this[name].bind(this));
 	}
 	getRoom() {
-		if(!this.room) throw "Client is not in a room";
+		if(!this.room) {
+			console.warn("Client is not in a room");
+			return;
+		}
 		return server.rooms[this.room];
 	}
 	getShip() {
-		if(!(this.room&&this.ship)) throw "Client is not in a ship or a room";
+		if(!(this.room&&this.ship)) {
+			console.warn("Client is not in a ship or a room");
+			return;
+		}
 		return server.rooms[this.room].ships[this.ship];
 	}
 	emit(...a) {
@@ -235,7 +244,7 @@ class Client {
 	}
 	disconnect() {
 		server.cancelShipRequest(this);
-		this.ship&&this.getShip().destroy(this);
+		if(this.ship) this.getShip().destroy(this);
 		console.log("Client Disconnected:", this.name);
 	}
 	joinGame(nickname) {
