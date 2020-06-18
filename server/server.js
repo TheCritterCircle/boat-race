@@ -105,6 +105,7 @@ class Room {
 		this.ships = {};
 		
 		this.size = {w:1920,h:5550};
+		this.start = 700;
 
 		console.log("Room Created:",this.name);
 	}
@@ -269,6 +270,12 @@ class Client {
 		ship.x = x;
 		ship.y = y;
 		ship.moving = moving;
+		if(room.sixe.h-room.start>y){
+			//Start Racve
+			room.started = true;
+			room.emit(this,'raceStart',{name:this.ship,x,y,moving});
+
+		}
 		room.emit(this,'moveShip',{name:this.ship,x,y,moving});
 	}
 	moveCrosshair(m) {

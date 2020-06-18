@@ -254,6 +254,11 @@ class Room extends createjs.Container {
 		this.ships[m.name].updateCrumb(m);
 	}
 
+	raceStart() {
+		console.log("Race Start");
+
+	}
+
 	moveCrosshair(c) {
 		console.log("moveCrosshair",c);
 		this.ships[c.name].updateCrumb(c);
@@ -336,6 +341,7 @@ class Game {
 		room.bind('addShip');
 		room.bind('removeShip');
 		socket.on('pending',room.bind('reset',true));
+		room.bind('raceStart');
 		room.bind('moveShip');
 		room.bind('moveCrosshair');
 	}
