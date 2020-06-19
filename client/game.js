@@ -304,34 +304,41 @@ class UIMap extends createjs.Container {
 		this.addChild(this.nodes);
 	}
 
-	positionNode(node,x,y) {
-		node.x = x;
-		node.y = y;
-	}
-
-	createNodeShape(graphics,sizeLocal,...p) {
-		graphics.drawCircle(0, 0, sizeLocal);
-	}
-
-	addNode(x,y,color,size,...p) {
+	newNode(x,y,color,size,...p) {
 		var node = new createjs.Shape();
 		this.nodes.addChild(node);
-		this.positionNode(node,x,y);
+		node.x = x;
+		node.y = y;
 		node.graphics.beginFill(color);
-		this.createNodeShape(node.graphics,size);
+		var scale = 2/(this.scaleX + this.scaleY)
+		this.createNodeShape(node.graphics,size*scale);
+	}
+
+
+	setScale(scale) {
+		this.scaleX = scale*game.getSize().h/game.room.size.h;
+		this.scaleY = scale*game.getSize().h/game.room.size.h;
+	}
+
+	setPos(x,y) {
+		this.x = x*(game.getSize().w-this.scaleX*game.room.size.w);
+		this.y = y*(game.getSize().h-this.scaleY*game.room.size.h);
 	}
 
 	update() {
 		this.nodes.removeAllChildren();
 		var ships = Object.values(game.room.ships).map(ship=>ship.getCrumb(true))
-		this.updateMap(ships);
+		ships.forEach(ship=>{
+			this.mapPlayer(ship)
+		});
+	}
+	
+	mapPlayer(player) {
+		this.newNode(player.x,player.y,"black");
 	}
 
-	updateMap(ships) {
-		console.log("wrong");
-		ships.forEach(ship=> {
-			this.addNode(ship.x,ship.y,"red",3);
-		})
+	createNodeShape(graphics,sizeLocal,...p) {
+		graphics.drawCircle(0, 0, sizeLocal);
 	}
 }
 
@@ -340,22 +347,18 @@ class Minimap extends UIMap {
 		super(game);
 		this.box = new createjs.Shape();
 		this.addChild(this.box);
-		this.box.graphics.beginFill("#dedede").drawRect(0, 0, game.room.size.w,game.room.size.h);
+		this.box.graphics.beginFill("rgba(222,222,222,.7)").drawRect(0, 0, game.room.size.w,game.room.size.h);
 		this.setChildIndex(this.box,0);
-
-		this.scaleX=.1
-		this.scaleY=.1
 	}
 
-	updateMap(ships) {
-		ships.forEach(ship=> {
-			this.addNode(ship.x,ship.y,"magenta",50);
-		})
+	update() {
+		super.update();
+		this.setScale(.30);
+		this.setPos(.99,.02);
 	}
 
-	scale(x,y) {
-		this.scale.x = x;
-		this.scale.y = y;
+	mapPlayer(player) {
+		this.newNode(player.x,player.y,"magenta",10);
 	}
 }
 
