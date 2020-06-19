@@ -305,13 +305,11 @@ class UIMap extends createjs.Container {
 	}
 
 	newNode(x,y,color,size,...p) {
-		var node = new createjs.Shape();
+		var scale = 2/(this.scaleX + this.scaleY)
+		var node = this.createNodeShape(size*scale,color)
 		this.nodes.addChild(node);
 		node.x = x;
 		node.y = y;
-		node.graphics.beginFill(color);
-		var scale = 2/(this.scaleX + this.scaleY)
-		this.createNodeShape(node.graphics,size*scale);
 	}
 
 
@@ -337,8 +335,10 @@ class UIMap extends createjs.Container {
 		this.newNode(player.x,player.y,"black");
 	}
 
-	createNodeShape(graphics,sizeLocal,...p) {
-		graphics.drawCircle(0, 0, sizeLocal);
+	createNodeShape(sizeLocal,color,...p) {
+		var node = new createjs.Shape();
+		node.graphics.beginFill(color).drawCircle(0, 0, sizeLocal);
+		return node;
 	}
 }
 
@@ -353,12 +353,44 @@ class Minimap extends UIMap {
 
 	update() {
 		super.update();
-		this.setScale(.30);
+		this.setScale(.4);
 		this.setPos(.99,.02);
 	}
 
 	mapPlayer(player) {
 		this.newNode(player.x,player.y,"magenta",10);
+	}
+}
+
+class Pointermap extends UIMap {
+	constructor(game) {
+		super(game);
+	}
+
+	mapPlayer(player) {
+		var margin = 30;
+		var y = player.y>game.player.y?game.room.size.h-margin:margin
+		var flip = Math.sign(y-game.room.size.h/2)
+		console.log(flip)
+		this.newNode(player.x,y,"magenta",flip*20,player.name);
+	}
+
+	createNodeShape(sizeLocal,color,name) {
+		var node = new createjs.Container();
+		var triangle = new createjs.Shape();
+		node.addChild(triangle)
+		triangle.graphics.beginFill(color).drawPolyStar(0, 0, sizeLocal,3,0,90);
+
+		var textContent = name||"Player"
+		
+		var text = new createjs.Text(textContent, "bold 20px Arial", "#ffffff");
+		node.addChild(text);
+		centerText(text);
+		var outline = new createjs.Text(textContent, "bold 20px Arial", "#000");
+		node.addChild(outline);
+		centerText(outline);
+		outline.outline = 1.1
+		return node;
 	}
 }
 
@@ -375,10 +407,14 @@ class HUD extends createjs.Container {
 
 		this.minimap = new Minimap(game);
 		this.addChild(this.minimap);
+
+		this.pointermap = new Pointermap(game);
+		this.addChild(this.pointermap);
 	}
 
 	update() {
 		this.minimap.update();
+		this.pointermap.update();
 	}
 }
 
