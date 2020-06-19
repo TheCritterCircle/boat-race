@@ -139,14 +139,23 @@ class Player extends GameObject {
 		return this.localToGlobal(this.crosshair.x,this.crosshair.y);
 	}
 
-	getCrumb() {
+	getCrumb(all) {
+		if(all) {
+			return {
+				name: this.name,
+				x: this.getPos().x,
+				y: this.getPos().y,
+				moving: this.moving,
+				crosshair: this.getCrosshairPos()
+			}
+		}
 		switch (this.mode) {
 			case 0:
 				return {
 					name: this.name,
 					mode: this.mode,
-					x: this.ship.x,
-					y: this.y,
+					x: this.getPos().x,
+					y: this.getPos().y,
 					moving: this.moving
 				}
 			case 1:
@@ -159,8 +168,8 @@ class Player extends GameObject {
 			return {
 				name: this.name,
 				mode: this.mode,
-				x: this.ship.x,
-				y: this.y,
+				x: this.getPos().x,
+				y: this.getPos().y,
 				moving: this.moving,
 				crosshair: this.getCrosshairPos()
 			}
@@ -288,6 +297,68 @@ class Room extends createjs.Container {
 	}
 }
 
+class UIMap extends createjs.Container {
+	constructor(game) {
+		super();
+		this.nodes = new createjs.Container();
+		this.addChild(this.nodes);
+	}
+
+	positionNode(node,x,y) {
+		node.x = x;
+		node.y = y;
+	}
+
+	createNodeShape(graphics,sizeLocal,...p) {
+		graphics.drawCircle(0, 0, sizeLocal);
+	}
+
+	addNode(x,y,color,size,...p) {
+		var node = new createjs.Shape();
+		this.nodes.addChild(node);
+		this.positionNode(node,x,y);
+		node.graphics.beginFill(color);
+		this.createNodeShape(node.graphics,size);
+	}
+
+	update() {
+		this.nodes.removeAllChildren();
+		var ships = Object.values(game.room.ships).map(ship=>ship.getCrumb(true))
+		this.updateMap(ships);
+	}
+
+	updateMap(ships) {
+		console.log("wrong");
+		ships.forEach(ship=> {
+			this.addNode(ship.x,ship.y,"red",3);
+		})
+	}
+}
+
+class Minimap extends UIMap {
+	constructor(game) {
+		super(game);
+		this.box = new createjs.Shape();
+		this.addChild(this.box);
+		this.box.graphics.beginFill("#dedede").drawRect(0, 0, game.room.size.w,game.room.size.h);
+		this.setChildIndex(this.box,0);
+
+		this.scaleX=.1
+		this.scaleY=.1
+	}
+
+	updateMap(ships) {
+		ships.forEach(ship=> {
+			this.addNode(ship.x,ship.y,"magenta",50);
+		})
+	}
+
+	scale(x,y) {
+		this.scale.x = x;
+		this.scale.y = y;
+	}
+}
+
 class HUD extends createjs.Container {
 	constructor(game) {
 		super();
@@ -298,10 +369,13 @@ class HUD extends createjs.Container {
 		this.outline = new createjs.Text("Waiting for 1 more player", "bold 50px Arial", "#000");
 		this.starting.addChild(this.outline);
 		this.outline.outline = 3
+
+		this.minimap = new Minimap(game);
+		this.addChild(this.minimap);
 	}
 
 	update() {
-
+		this.minimap.update();
 	}
 }
 
@@ -373,6 +447,7 @@ class Game {
 		this.stage.canvas.width = window.innerWidth;
 		this.stage.canvas.height = window.innerHeight
 		this.player&&this.room.update();
+		this.hud.update();
 		this.stage.update();
 	}
 

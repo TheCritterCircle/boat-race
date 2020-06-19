@@ -1,4 +1,4 @@
-const MULTIPLAYER = true;
+const MULTIPLAYER = false;
 
 game = new Game("viewport", window.innerWidth, window.innerHeight);
 
