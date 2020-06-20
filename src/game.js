@@ -20,9 +20,14 @@ class Game {
 		this.shipInfo = {};
 
 		//Setup Events
-		window.onkeydown = this.inputDown.bind(this);
-		window.onkeyup = this.inputUp.bind(this);
-		this.stage.on("stagemousemove", this.mouseMove.bind(this));
+		window.onkeydown = this.bindEvent("inputDown");
+		window.onkeyup = this.bindEvent("inputUp");
+		this.stage.on("stagemousemove", this.bindEvent("mouseMove"));
+		this.stage.on("stagemousedown",this.bindEvent("mouseClick"));
+	}
+
+	bindEvent(f) {
+		this[f].bind(this);
 	}
 
 	getSize() {
@@ -68,6 +73,10 @@ class Game {
 		this.player&&this.room.update();
 		this.hud.update();
 		this.stage.update();
+	}
+
+	mouseClick(e) {
+
 	}
 
 	mouseMove(e) {
