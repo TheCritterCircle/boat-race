@@ -46,3 +46,13 @@ function norm(...p) {
 	var length = mag(...p);
 	return p.map(i=>i/length);
 }
+
+function collided(a,b) {
+	var aBounds = a.getBounds();
+	var bBounds = b.getBounds();
+	if 	(aBounds.x >= bBounds.x + bBounds.width 
+		|| aBounds.x + aBounds.width <= bBounds.x 
+		|| aBounds.y >= bBounds.y + bBounds.height 
+		|| aBounds.y + aBounds.height <= bBounds.y ) return false;
+    return true;
+}

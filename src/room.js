@@ -6,9 +6,12 @@ class Room extends createjs.Container {
 
 		//Properies
 		this.size = {w:1920,h:5550};
+		//this.setBounds(x,y,width,height);
 		var screen = game.getSize();
 		this.startY = this.size.h-screen.h/2;
 		this.ships = {}
+
+		this.setBounds(0,0,this.size.w,this.size.h)
 		this.cannonballs = [];
 	}
 
@@ -52,9 +55,20 @@ class Room extends createjs.Container {
 	}
 
 	fire(player) {
-		var cannonball = new CannonBall(game,player);
+		var cannonball = new CannonBall(game,game.room.ships[player.name]);
 		this.addChild(cannonball);
 		this.cannonballs.push(cannonball);
+		if(this.cannonballs.length>5) {
+			this.removeCannonball(this.cannonballs[0]);
+		}
+	}
+
+	removeCannonball(cannonball) {
+		var i = this.cannonballs.indexOf(cannonball);
+		if(i>-1) {
+			cannonball.destroy();
+			this.cannonballs.splice(i,1);
+		}
 	}
 
 	joinShip(shipInfo) {

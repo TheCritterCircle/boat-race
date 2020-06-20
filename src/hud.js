@@ -16,6 +16,10 @@ class HUD extends createjs.Container {
 		this.addChild(this.pointermap);
 	}
 
+	splash(text) {
+		
+	}
+
 	update() {
 		this.minimap.update();
 		this.pointermap.update();

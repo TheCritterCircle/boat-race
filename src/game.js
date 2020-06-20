@@ -76,11 +76,12 @@ class Game {
 	}
 
 	mouseClick(e) {
-
+		this.fire();
 	}
 
 	fire() {
-		this.room.fire(this.player);
+		this.room.fire(this.player.getCrumb(true));
+		this.emit("fire",this.player.getCrumb(true));
 	}
 
 	mouseMove(e) {
