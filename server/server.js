@@ -178,6 +178,7 @@ class Client {
 		this.bindSocket("joinGame");
 		this.bindSocket("moveShip");
 		this.bindSocket("moveCrosshair");
+		this.bindSocket("fire");
 		console.log("Client Connected:", this.name);
 
 	}
@@ -214,6 +215,13 @@ class Client {
 		server.requestShip(this);
 	}
 
+	fire() {
+		var ship = this.getShip();
+		var room = this.getRoom();
+		room.emit(this,'fire',{name:this.ship,x:ship.x,y:ship.y,crosshair:m});
+
+	}
+
 	moveShip(m) {
 		console.log(this.name,"moveShip",m)
 		var {x,y,moving} = m;
@@ -223,12 +231,12 @@ class Client {
 		ship.x = x;
 		ship.y = y;
 		ship.moving = moving;
-		if(room.size.h-room.start>y){
+		/*if(room.size.h-room.start>y){
 			//Start Racve
 			room.started = true;
 			room.emit(this,'raceStart',{name:this.ship,x,y,moving});
 
-		}
+		}*/
 		room.emit(this,'moveShip',{name:this.ship,x,y,moving});
 	}
 	moveCrosshair(m) {
