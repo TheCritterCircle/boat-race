@@ -50,6 +50,10 @@ class Player extends GameObject {
 		this.ship.x = 0;
 	}
 
+	getPos() {
+			return this.ship.localToLocal(0,0,game.room);
+	}
+
 	setCrosshairPos(x, y) {
 		var mouse = this.globalToLocal(x,y);
 		this.crosshair.x = mouse.x;
@@ -57,7 +61,7 @@ class Player extends GameObject {
 	}
 
 	getCrosshairPos() {
-		return this.localToGlobal(this.crosshair.x,this.crosshair.y);
+		return this.crosshair.localToGlobal(0,0);
 	}
 
 	getCrumb(all) {

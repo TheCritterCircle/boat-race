@@ -7,7 +7,7 @@ class UIMap extends createjs.Container {
 
 	newNode(x,y,color,size,...p) {
 		var scale = 2/(this.scaleX + this.scaleY)
-		var node = this.createNodeShape(size*scale,color)
+		var node = this.createNodeShape(size*scale,color,...p)
 		this.nodes.addChild(node);
 		node.x = x;
 		node.y = y;
