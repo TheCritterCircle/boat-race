@@ -79,6 +79,10 @@ class Game {
 
 	}
 
+	fire() {
+		this.room.fire(this.player);
+	}
+
 	mouseMove(e) {
 		if (!this.player||(this.player.mode != 1&&this.player.mode != -1)) return;
 		//this.player.setCrosshairPos(e.stageX-game.getSize().w/2, e.stageY-game.getSize().h/2);

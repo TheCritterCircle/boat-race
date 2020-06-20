@@ -28,3 +28,21 @@ function centerText (text) {
 var b = text.getBounds();
 	text.x += - (b.width/2); 
 }
+
+function vec(...p) {
+	return 1 == p.length ? "object" == typeof p[0] ? Object.values(p[0]) : p[0] : p
+}
+
+function mag2(...p) {
+    return (p = vec(...p)).reduce((e,i)=>e + i * i, 0)
+}
+
+function mag(...p) {
+	return Math.sqrt(mag2(...p));
+}
+
+function norm(...p) {
+	p = vec(...p);
+	var length = mag(...p);
+	return p.map(i=>i/length);
+}

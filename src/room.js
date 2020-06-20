@@ -9,6 +9,7 @@ class Room extends createjs.Container {
 		var screen = game.getSize();
 		this.startY = this.size.h-screen.h/2;
 		this.ships = {}
+		this.cannonballs = [];
 	}
 
 	bind(action,ret) {
@@ -20,6 +21,7 @@ class Room extends createjs.Container {
 
 	update() {
 		Object.values(this.ships).forEach(ship => { ship.update() })
+		this.cannonballs.forEach(ship => { ship.update() })
 
 		var screen = game.getSize();
 		var playerPos = game.player.getPos();
@@ -47,6 +49,12 @@ class Room extends createjs.Container {
 		Object.values(this.ships).forEach(ship=>{ship.destroy()});
 		this.ships = {};
 		this.shipInfo = {};
+	}
+
+	fire(player) {
+		var cannonball = new CannonBall(game,player);
+		this.addChild(cannonball);
+		this.cannonballs.push(cannonball);
 	}
 
 	joinShip(shipInfo) {

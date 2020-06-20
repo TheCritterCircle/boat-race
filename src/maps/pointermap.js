@@ -4,47 +4,34 @@ class Pointermap extends UIMap {
 	}
 
 	mapPlayer(player) {
-		var margin = 30;
-		var screenSize = game.getSize();
-		var userPos = game.player.getPos();
-		var screenPos = game.room.localToGlobal(player.x,player.y);
-
-        var y = screenPos.y;
-		var x = screenPos.x;
-		var scale = 0;
-		if(y>screenSize.h||y <0||x>screenSize.w||x <0) {
-			scale=20;
-		}
-		var right = x>screenSize.w;
-		var left = x <0;
-		var up = y <0;
-		var down = y>screenSize.h
-
-		if(right) {
-			x=screenSize.w-margin;
-		}
-		if(left) {
-			x=margin;
-		}
-		if(down) {
-			y=screenSize.h-margin;
-			dir=1
-		}
-		if(up) {
-			y=margin;
-		}
-		var dir = Math.atan2(screenPos.y-y,screenPos.x-x)*180/Math.PI;
-		console.log(dir)
-		this.newNode(x,y,"magenta",scale,player.name,dir);
+		var margin = 30
+			, screenSize = game.getSize()
+			, screenPos = game.room.localToGlobal(player.x, player.y)
+			, y = screenPos.y
+			, x = screenPos.x
+			, scale = 0;
+		// If Outside Screen
+		(y > screenSize.h || y < 0 || x > screenSize.w || x < 0) && (scale = 20);
+		// Right
+		x > screenSize.w && (x = screenSize.w - margin);
+		// Left
+		x < 0 && (x = 30);
+		// Up
+		y < 0 && (y = screenSize.h - 30, dir = 1);
+		// Down
+		y > screenSize.h && (y = 30);
+		// Point Arrow Towards Player
+		var dir = 180 * Math.atan2(screenPos.y - y, screenPos.x - x) / Math.PI;
+		this.newNode(x, y, "magenta", scale, player.name, dir)
 	}
 
-	createNodeShape(sizeLocal,color,name,dir) {
+	createNodeShape(sizeLocal, color, name, dir) {
 		var node = new createjs.Container();
 		var triangle = new createjs.Shape();
 		node.addChild(triangle);
-		triangle.graphics.beginFill(color).drawPolyStar(0, 0, sizeLocal,3,0,dir);
+		triangle.graphics.beginFill(color).drawPolyStar(0, 0, sizeLocal, 3, 0, dir);
 
-		var textContent = name||"Player";
+		var textContent = name || "Player";
 		var text = new createjs.Text(textContent, "bold 20px Arial", "#ffffff");
 		node.addChild(text);
 		centerText(text);
