@@ -187,6 +187,14 @@ class Player extends GameObject {
 	}
 }
 
+class CannonBall extends GameObject {
+	constructor(game,player) {
+		super(game,...Object.values(player.getPos()));
+
+		
+	}
+}
+
 class Coin extends GameObject {
 	constructor(game, x, y) {
 		super(game, x, y);
