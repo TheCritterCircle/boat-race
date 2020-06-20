@@ -80,6 +80,7 @@ class Game {
 	}
 
 	fire() {
+		if (!this.player||(this.player.mode != 1&&this.player.mode != -1)) return;
 		this.room.fire(this.player.getCrumb(true));
 		this.emit("fire",this.player.getCrumb(true));
 	}
