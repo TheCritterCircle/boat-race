@@ -55,6 +55,7 @@ class Room extends createjs.Container {
 	}
 
 	fire(player) {
+		console.log("fire",player);
 		var cannonball = new CannonBall(game,game.room.ships[player.name]);
 		this.addChild(cannonball);
 		this.cannonballs.push(cannonball);

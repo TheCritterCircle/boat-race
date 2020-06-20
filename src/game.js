@@ -60,6 +60,7 @@ class Game {
 		room.bind('addShip');
 		room.bind('removeShip');
 		socket.on('pending',room.bind('reset',true));
+		room.bind('fire');
 		room.bind('raceStart');
 		room.bind('moveShip');
 		room.bind('moveCrosshair');

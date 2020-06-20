@@ -221,10 +221,11 @@ class Client {
 		server.requestShip(this);
 	}
 
-	fire() {
+	fire(p) {
+		console.log(this.name,"fire",p)
 		var ship = this.getShip();
 		var room = this.getRoom();
-		room.emit(this,'fire',{name:this.ship,x:ship.x,y:ship.y,crosshair:m});
+		if(room) room.emit(this,'fire',p);
 
 	}
 
