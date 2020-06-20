@@ -17,9 +17,9 @@ class Pointermap extends UIMap {
 		// Left
 		x < 0 && (x = 30);
 		// Up
-		y < 0 && (y = screenSize.h - 30, dir = 1);
+		y < 0 && (y = margin, dir = 1);
 		// Down
-		y > screenSize.h && (y = 30);
+		y > screenSize.h && (y = screenSize.h - margin);
 		// Point Arrow Towards Player
 		var dir = 180 * Math.atan2(screenPos.y - y, screenPos.x - x) / Math.PI;
 		this.newNode(x, y, "magenta", scale, player.name, dir)
