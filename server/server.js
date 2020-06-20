@@ -1,7 +1,6 @@
 "use strict";
 
 const socketIo = require('socket.io');
-const e = require('express');
 
 class Server {
 	constructor(httpServer) {
