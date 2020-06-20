@@ -67,6 +67,11 @@ class Room {
 		this.started = true;
 	}
 
+	reset() {
+		console.log(this.name + "has been reset")
+		this.started = false;
+	}
+
 	emit(client,...a) {
 		client.socket.to(this.name).emit(...a);
 	}
@@ -83,13 +88,14 @@ class Room {
 		this.emit(client,'removeShip',ship.getCrumb());
 		this.ships[ship.name] = undefined;
 		delete this.ships[ship.name];
-		console.log("removed ship",name)
+		console.log("removed ship",name);
+		if(this.ships.length == 0) this.reset();
 	}
 }
 
 class Ship {
 	constructor(captain,cannon) {
-		this.name = captain.name + "-" + cannon.name; 
+		this.name = captain.name + "&" + cannon.name; 
 		this.x = 0;
 		this.y = 0;
 		this.moving = {
