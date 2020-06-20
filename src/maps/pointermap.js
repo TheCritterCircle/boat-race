@@ -9,29 +9,22 @@ class Pointermap extends UIMap {
 		var userPos = game.player.getPos();
 		var screenPos = game.room.localToGlobal(player.x,player.y);
 
-        var dir;
         var y = screenPos.y;
 		var x = screenPos.x;
 		var scale = 0;
 		if(y>screenSize.h||y <0||x>screenSize.w||x <0) {
 			scale=20;
 		}
-
-
 		var right = x>screenSize.w;
 		var left = x <0;
 		var up = y <0;
 		var down = y>screenSize.h
 
 		if(right) {
-			//Right of Screen
 			x=screenSize.w-margin;
-			dir=0;
-
 		}
 		if(left) {
 			x=margin;
-			dir=2;
 		}
 		if(down) {
 			y=screenSize.h-margin;
@@ -39,11 +32,9 @@ class Pointermap extends UIMap {
 		}
 		if(up) {
 			y=margin;
-			dir=3
 		}
-		if(down||up) {
-			x=screenPos.x;
-		}
+		var dir = Math.atan2(screenPos.y-y,screenPos.x-x)*180/Math.PI;
+		console.log(dir)
 		this.newNode(x,y,"magenta",scale,player.name,dir);
 	}
 
@@ -51,7 +42,7 @@ class Pointermap extends UIMap {
 		var node = new createjs.Container();
 		var triangle = new createjs.Shape();
 		node.addChild(triangle);
-		triangle.graphics.beginFill(color).drawPolyStar(0, 0, sizeLocal,3,0,dir*90);
+		triangle.graphics.beginFill(color).drawPolyStar(0, 0, sizeLocal,3,0,dir);
 
 		var textContent = name||"Player";
 		var text = new createjs.Text(textContent, "bold 20px Arial", "#ffffff");
