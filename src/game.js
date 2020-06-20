@@ -27,7 +27,7 @@ class Game {
 	}
 
 	bindEvent(f) {
-		this[f].bind(this);
+		return this[f].bind(this);
 	}
 
 	getSize() {
