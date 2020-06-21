@@ -110,8 +110,8 @@ class Room extends createjs.Container {
 		this.addChild(ship);
 		if(!game.player && 
 			(
-				gama.shipInfo.id && game.shipInfo.id==ship.id
-			||	game.shipInfo.id && game.shipInfo.name==ship.name
+				ship.id && game.shipInfo.id==ship.id
+			||	ship.name && game.shipInfo.name==ship.name
 			)) {
 			ship.id = game.shipInfo.id;
 			ship.mode = game.shipInfo.mode;
