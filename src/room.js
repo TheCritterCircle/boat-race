@@ -76,6 +76,7 @@ class Room extends createjs.Container {
 		game.hud.starting.visible = false
 		console.log("joinShip",shipInfo);
 		console.log("You are the",(shipInfo.mode==0?"Captain":"Cannon") + "!")
+		game.shipInfo.id = shipInfo.id;
 		game.shipInfo.name = shipInfo.name;
 		game.shipInfo.mode = shipInfo.mode;
 
@@ -106,12 +107,17 @@ class Room extends createjs.Container {
 		var ship = new Player(this, s.name);
 		ship.updateCrumb(s);
 		this.ships[ship.name] = ship;
-		if(ship.name == game.shipInfo.name) {
+		this.addChild(ship);
+		if(!game.player && 
+			(
+				gama.shipInfo.id && game.shipInfo.id==ship.id
+			||	game.shipInfo.id && game.shipInfo.name==ship.name
+			)) {
+			ship.id = game.shipInfo.id;
 			ship.mode = game.shipInfo.mode;
 			console.log(game.shipInfo.mode==0?(ship.cannon + ": Aye Aye Captain!"):(ship.captain + ": Ahoy Mateys!"))
 			game.player=ship;
 		}
-		this.addChild(ship);
 	}
 
 	removeShip(s) {

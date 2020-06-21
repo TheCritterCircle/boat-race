@@ -43,16 +43,15 @@ class Player extends GameObject {
 			( this.moving.down / 2 - this.moving.up) * this.speed// - .2
 		);
 		if(this.mode==1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
-
 		this.physics.update();
 		this.y += this.ship.y;
-		this.ship.y = 0;
 		this.x += this.ship.x;
+		this.ship.y = 0;
 		this.ship.x = 0;
 	}
 
 	getPos() {
-			return this.ship.localToLocal(0,0,game.room);
+		return this.ship.localToLocal(0,0,game.room);
 	}
 
 	setCrosshairPos(x, y) {
@@ -103,8 +102,9 @@ class Player extends GameObject {
 	}
 
 	updateCrumb(p) {
-		p.mode && (this.mode = p.mode);
+		p.id && (this.id = p.id);
 		p.name && (this.name = p.name);
+		p.mode && (this.mode = p.mode);
 		p.captain && (this.captainNickname.text = this.captain = p.captain)&&centerText(this.captainNickname);
 		p.cannon && (this.cannonNickname.text = this.cannon = p.cannon)&&centerText(this.cannonNickname);
 		p.x && p.y && this.setPos(p.x, p.y);

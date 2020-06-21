@@ -95,6 +95,7 @@ class Room {
 
 class Ship {
 	constructor(captain,cannon) {
+		this.id = captain.getID() + cannon.getID();
 		this.name = captain.name + "-" + cannon.name; 
 		this.x = 0;
 		this.y = 0;
@@ -121,6 +122,7 @@ class Ship {
 
 	getCrumb() {
 		return {
+			id: this.id,
 			name: this.name,
 			captain:this.captain.name,
 			cannon:this.cannon.name,
@@ -148,11 +150,13 @@ class Ship {
 		this.x = room.size.w/2;
 		this.y = room.size.h-100;
 		this.captain.emit('joinShip', {
+			id:this.id,
 			name: this.name,
 			mode: 0,
 			ships: room.getShips()
 		});
 		this.cannon.emit('joinShip', {
+			id:this.id,
 			name: this.name,
 			mode: 1,
 			ships: room.getShips()
