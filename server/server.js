@@ -95,7 +95,7 @@ class Room {
 
 class Ship {
 	constructor(captain,cannon) {
-		this.name = captain.name + "&" + cannon.name; 
+		this.name = captain.name + "-" + cannon.name; 
 		this.x = 0;
 		this.y = 0;
 		this.moving = {
