@@ -41,7 +41,7 @@ class Player extends GameObject {
 			(this.moving.right - this.moving.left) * this.speed,
 			( this.moving.down / 2 - this.moving.up) * this.speed// - .2
 		);
-		if(this.mode==1||this.mode==-1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
+		if(this.mode==1||this.mode==-2)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
 
 		this.physics.update();
 		this.y += this.ship.y;

@@ -81,13 +81,13 @@ class Game {
 	}
 
 	fire() {
-		if (!this.player||(this.player.mode != 1&&this.player.mode != -1)) return;
+		if (!this.player||(this.player.mode != 1&&this.player.mode != -2)) return;
 		this.room.fire(this.player.getCrumb(true));
 		this.emit("fire",this.player.getCrumb(true));
 	}
 
 	mouseMove(e) {
-		if (!this.player||(this.player.mode != 1&&this.player.mode != -1)) return;
+		if (!this.player||(this.player.mode != 1&&this.player.mode != -2)) return;
 		//this.player.setCrosshairPos(e.stageX-game.getSize().w/2, e.stageY-game.getSize().h/2);
 
 		this.player.setCrosshairPos(e.stageX, e.stageY);
@@ -95,7 +95,7 @@ class Game {
 	}
 
 	inputDown(e) {
-		if (!this.player||(this.player.mode != 0&&this.player.mode !=-1)) return;
+		if (!this.player||(this.player.mode != 0&&this.player.mode !=-2)) return;
 		console.log("INPUT: " + e.keyCode)
 		switch (e.keyCode) {
 			// Up (-X)

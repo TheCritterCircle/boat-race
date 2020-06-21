@@ -8,7 +8,7 @@ game.emit("joinGame",prompt("Username"));
 } else {
 	game.room.joinShip({
 		name:"local",
-		mode:-1,
+		mode:-2,
 		ships: [{
 			name: "local",
 			x: game.room.size.w/2,
