@@ -40,8 +40,8 @@ class Room extends createjs.Container {
 		}
 		if(this.x<minW) {
 			this.x = minW;
-		} else if(this.x>-minW) {
-			this.x = -minW;
+		} else if(this.x>0) {
+			this.x = 0;
 		}
 	}
 
@@ -56,7 +56,7 @@ class Room extends createjs.Container {
 
 	fire(player) {
 		console.log("fire",player);
-		var cannonball = new CannonBall(game,game.room.ships[player.name]);
+		var cannonball = new CannonBall(game,game.room.ships[player.id||player.name]);
 		this.addChild(cannonball);
 		this.cannonballs.push(cannonball);
 		if(this.cannonballs.length>5) {
@@ -88,7 +88,7 @@ class Room extends createjs.Container {
 	moveShip(m) {
 		console.log("moveShip",m);
 		if(m.name == game.player.name&&game.player.mode ==0) return;
-		this.ships[m.name].updateCrumb(m);
+		this.ships[m.id||m.name].updateCrumb(m);
 	}
 
 	raceStart() {
@@ -98,15 +98,15 @@ class Room extends createjs.Container {
 
 	moveCrosshair(c) {
 		console.log("moveCrosshair",c);
-		this.ships[c.name].updateCrumb(c);
+		this.ships[c.id||c.name].updateCrumb(c);
 	}
 
 	addShip(s) {
-		if(this.ships[s.name]) return;
+		if(this.ships[s.id||s.name]) return;
 		console.log("addShip",s);
 		var ship = new Player(this, s.name);
 		ship.updateCrumb(s);
-		this.ships[ship.name] = ship;
+		this.ships[ship.id||ship.name] = ship;
 		this.addChild(ship);
 		if(!game.player && 
 			(
@@ -122,8 +122,8 @@ class Room extends createjs.Container {
 
 	removeShip(s) {
 		console.log("removeShip",s);
-		if(!this.ships[s.name]) return;
+		if(!this.ships[s.id||s.name]) return;
 		this.ships[s.name].destroy();
-		delete this.ships[s.name];
+		delete this.ships[s.id||s.name];
 	}
 }

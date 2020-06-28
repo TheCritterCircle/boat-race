@@ -5,6 +5,8 @@ class Player extends GameObject {
 		this.mode = -1;
 		this.speed = .3
 		this.moving = { up: 0, down: 0, left: 0, right: 0 };
+		this.screen = [];
+		this.screen.length = [];
 
 		//Ship
 		this.ship = new createjs.Container();
@@ -42,6 +44,7 @@ class Player extends GameObject {
 			(this.moving.right - this.moving.left) * this.speed,
 			( this.moving.down / 2 - this.moving.up) * this.speed// - .2
 		);
+		if(this.mode>-1)this.screen[this.mode] = game.getScreenBounds();
 		if(this.mode==1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
 		this.physics.update();
 		this.y += this.ship.y;
@@ -71,6 +74,7 @@ class Player extends GameObject {
 				x: this.getPos().x,
 				y: this.getPos().y,
 				moving: this.moving,
+				scree:this.screen,
 				crosshair: this.getCrosshairPos()
 			}
 		}
@@ -81,12 +85,14 @@ class Player extends GameObject {
 					mode: this.mode,
 					x: this.getPos().x,
 					y: this.getPos().y,
+					screen: this.screen,
 					moving: this.moving
 				}
 			case 1:
 				return {
 					name: this.name,
 					mode: this.mode,
+					screen: this.screen,
 					crosshair: this.getCrosshairPos()
 				}
 			default: 
@@ -96,6 +102,7 @@ class Player extends GameObject {
 				x: this.getPos().x,
 				y: this.getPos().y,
 				moving: this.moving,
+				screen: this.screen,
 				crosshair: this.getCrosshairPos()
 			}
 		}
@@ -107,6 +114,7 @@ class Player extends GameObject {
 		p.mode && (this.mode = p.mode);
 		p.captain && (this.captainNickname.text = this.captain = p.captain)&&centerText(this.captainNickname);
 		p.cannon && (this.cannonNickname.text = this.cannon = p.cannon)&&centerText(this.cannonNickname);
+		p.screen && (this.screen = p.screen);
 		p.x && p.y && this.setPos(p.x, p.y);
 		p.moving && (this.moving = p.moving);
 		p.crosshair && this.setCrosshairPos(p.crosshair.x,p.crosshair.y);

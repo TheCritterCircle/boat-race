@@ -37,6 +37,16 @@ class Game {
 		}
 	}
 
+	getScreenBounds() {
+		var pos = game.room?game.room.globalToLocal(0,0):{x:0,y:0};
+		return {
+			x:pos.x,
+			y:pos.y,
+			w:this.stage.canvas.width,
+			h:this.stage.canvas.height
+		}
+	}
+
 	//Socket Utils
 	emit(...a) {
 		this.socket&&(this.socket.emit(...a));
@@ -77,13 +87,14 @@ class Game {
 	}
 
 	mouseClick(e) {
-		this.fire();
+		this.fire(e);
 	}
 
-	fire() {
+	fire(e) {
 		if (!this.player||this.player.mode != 1) return;
-		this.room.fire(this.player.getCrumb(true));
-		this.emit("fire",this.player.getCrumb(true));
+		this.player.setCrosshairPos(e.stageX, e.stageY);
+		this.room.fire({id:player.id,name:player.name,crosshair:this.player.getCrosshairPos()});
+		this.emit("fire",this.player.getCrosshairPos());
 	}
 
 	mouseMove(e) {

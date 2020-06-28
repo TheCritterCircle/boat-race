@@ -79,15 +79,15 @@ class Room {
 		return Object.values(this.ships).map(s => s.getCrumb());
 	}
 	addShip(client,ship) {
-		this.ships[ship.name] = ship;
+		this.ships[ship.id] = ship;
 		ship.join(this);
 		this.emit(client,"addShip",ship.getCrumb())
 	}
 	removeShip(client,ship) {
 		var name = ship.name;
 		this.emit(client,'removeShip',ship.getCrumb());
-		this.ships[ship.name] = undefined;
-		delete this.ships[ship.name];
+		this.ships[ship.id] = undefined;
+		delete this.ships[ship.id];
 		console.log("removed ship",name);
 		if(this.ships.length == 0) this.reset();
 	}
@@ -111,9 +111,9 @@ class Ship {
 
 		console.log("Ship Created:",this.name)
 		captain.join(this.name);
-		captain.ship = this.name;
+		captain.ship = this.id;
 		cannon.join(this.name);
-		cannon.ship = this.name;
+		cannon.ship = this.id;
 	}
 
 	emit(client,...a) {
@@ -248,7 +248,7 @@ class Client {
 			room.emit(this,'raceStart',{name:this.ship,x,y,moving});
 
 		}*/
-		room.emit(this,'moveShip',{name:this.ship,x,y,moving});
+		room.emit(this,'moveShip',{id:this.ship,name:ship.name,x,y,moving});
 	}
 	moveCrosshair(m) {
 		console.log(this.name,"moveCrosshair",m)
@@ -256,7 +256,7 @@ class Client {
 		var ship = this.getShip();
 		var room = this.getRoom();
 		ship.crosshair = m;
-		room.emit(this,'moveCrosshair',{name:this.ship,crosshair:m});
+		room.emit(this,'moveCrosshair',{id:this.ship,name:ship.name,crosshair:m});
 	}
 
 	join(a) {

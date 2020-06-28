@@ -3,7 +3,8 @@ class CannonBall extends GameObject {
 		super(game,...Object.values(player.getPos()));
 		this.cannonBallGraphic = new createjs.Shape();
 		this.addChild(this.cannonBallGraphic);
-		this.cannonBallGraphic.graphics.beginFill("black").drawCircle(0, 0, 15);
+		this.radius = 15;
+		this.cannonBallGraphic.graphics.beginFill("black").drawCircle(0, 0, this.radius);
 
 		var target = player.crosshair.localToLocal(0,0,game.room);
 		var dist = norm({
@@ -20,6 +21,7 @@ class CannonBall extends GameObject {
 		var speed = 15;
 		this.x +=this.dir.x*speed;
 		this.y+=this.dir.y*speed;
+		this.setBounds(this.x,this.y,this.radius,this.radius)
 
 		if(!collided(this,game.room)) {
 			game.room.removeCannonball(this);
