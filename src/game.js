@@ -93,7 +93,7 @@ class Game {
 	fire(e) {
 		if (!this.player||this.player.mode != 1) return;
 		this.player.setCrosshairPos(e.stageX, e.stageY);
-		this.room.fire({id:player.id,name:player.name,crosshair:this.player.getCrosshairPos()});
+		this.room.fire({id:this.player.id,name:this.player.name,crosshair:this.player.getCrosshairPos()});
 		this.emit("fire",this.player.getCrosshairPos());
 	}
 
