@@ -74,13 +74,14 @@ class Player extends GameObject {
 				x: this.getPos().x,
 				y: this.getPos().y,
 				moving: this.moving,
-				scree:this.screen,
+				screen:this.screen,
 				crosshair: this.getCrosshairPos()
 			}
 		}
 		switch (this.mode) {
 			case 0:
 				return {
+					id:this.id,
 					name: this.name,
 					mode: this.mode,
 					x: this.getPos().x,
@@ -90,6 +91,7 @@ class Player extends GameObject {
 				}
 			case 1:
 				return {
+					id:this.id,
 					name: this.name,
 					mode: this.mode,
 					screen: this.screen,
@@ -97,6 +99,7 @@ class Player extends GameObject {
 				}
 			default: 
 			return {
+				id:this.id,
 				name: this.name,
 				mode: this.mode,
 				x: this.getPos().x,

@@ -5,7 +5,7 @@ class Game {
 		this.stage.canvas.width = w;
 		this.stage.canvas.height = h;
 		//this.stage.canvas.style.cursor = "none";
-
+		
 		//Setup Game Loop
 		createjs.Ticker.setFPS(60);
 		createjs.Ticker.addEventListener("tick", this.update.bind(this));

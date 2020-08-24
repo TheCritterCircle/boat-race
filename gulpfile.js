@@ -7,14 +7,11 @@ var gulp = require('gulp'),
 
 function buildClient() {
 	return gulp.src("src/**/*.js")
-		.pipe(plumber({
-			errorHandler: function (error) {
-				console.log(error.message);
-				this.emit('end');
-			}
-		}))
+		.pipe(plumber())
 		.pipe(sourcemaps.init())
-		.pipe(terser())
+		.pipe(terser({
+			warnings:"verbose"
+		}))
 		.pipe(concat('game.min.js'))
 			.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../src' }))
 			.pipe(gulp.dest('client'))
@@ -28,6 +25,6 @@ gulp.task('server', function () {
 		server: ".",
 		port: 8080
 	});
-	gulp.watch("*", buildClient);
+	gulp.watch("src/**/*.js", buildClient);
 	gulp.watch("client/game.min.js").on('change', browserSync.reload);
 });

@@ -4,6 +4,7 @@ class Pointermap extends UIMap {
 	}
 
 	mapPlayer(player) {
+		if(player.id==game.player.id) return;
 		var margin = 30
 			, screenSize = game.getSize()
 			, screenPos = game.room.localToGlobal(player.x, player.y)
@@ -32,13 +33,14 @@ class Pointermap extends UIMap {
 		triangle.graphics.beginFill(color).drawPolyStar(0, 0, sizeLocal, 3, 0, dir);
 
 		var textContent = name || "Player";
-		var text = new createjs.Text(textContent, "bold 20px Arial", "#ffffff");
+		var text = new Text(textContent,{outline:{size:1.1}});
+		//var text = new createjs.Text(textContent, "bold 20px Arial", "#ffffff");
 		node.addChild(text);
 		centerText(text);
-		var outline = new createjs.Text(textContent, "bold 20px Arial", "#000");
+		/*var outline = new createjs.Text(textContent, "bold 20px Arial", "#000");
 		node.addChild(outline);
 		centerText(outline);
-		outline.outline = 1.1;
+		outline.outline = 1.1;*/
 		return node;
 	}
 }

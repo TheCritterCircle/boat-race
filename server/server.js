@@ -229,7 +229,11 @@ class Client {
 		console.log(this.name,"fire",p)
 		var ship = this.getShip();
 		var room = this.getRoom();
-		if(room) room.emit(this,'fire',p);
+		if(room) {
+			p.id = ship.id,
+			p.name = ship.name;
+			room.emit(this,'fire',p);
+		}
 
 	}
 
