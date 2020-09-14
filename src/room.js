@@ -49,9 +49,10 @@ class Room extends createjs.Container {
 		game.hud.starting.visible = true;
 		console.log("We be finding you a crew...")
 		this.player = undefined;
+		delete this.player;
 		Object.values(this.ships).forEach(ship=>{ship.destroy()});
-		this.ships = {};
-		this.shipInfo = {};
+		this.ships = new Object;
+		this.shipInfo = new Object;
 	}
 
 	fire(player) {

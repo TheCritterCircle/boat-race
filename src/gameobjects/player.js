@@ -45,7 +45,7 @@ class Player extends GameObject {
 			( this.moving.down / 2 - this.moving.up) * this.speed// - .2
 		);
 		if(this.mode>-1)this.screen[this.mode] = game.getScreenBounds();
-		if(this.mode==1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
+		//if(this.mode==1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
 		this.physics.update();
 		this.y += this.ship.y;
 		this.x += this.ship.x;
@@ -58,13 +58,15 @@ class Player extends GameObject {
 	}
 
 	setCrosshairPos(x, y) {
-		var mouse = this.globalToLocal(x,y);
-		this.crosshair.x = mouse.x;
-		this.crosshair.y = mouse.y;
+		this.crosshair.x = x;
+		this.crosshair.y = y;
 	}
 
 	getCrosshairPos() {
-		return this.crosshair.localToGlobal(0,0);
+		return {
+			x: this.crosshair.x,
+			y: this.crosshair.y
+		}
 	}
 
 	getCrumb(all) {
