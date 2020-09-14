@@ -34,12 +34,22 @@ class Player extends GameObject {
 			this.cannonNickname.y = 20;
 			centerText(this.cannonNickname)
 
+		//Target line
+			this.targetLine = new createjs.Shape();
+			this.addChild(this.targetLine);
+			this.targetLine.graphics.setStrokeStyle(1).beginStroke("rgba(0,0,0,1)");
+			this.targetLine.startPoint = this.targetLine.graphics.moveTo(0,0).command;
+			var ch = this.getCrosshairPos();
+			this.targetLine.endPoint = this.targetLine.graphics.lineTo(ch.x,ch.y).command;
+			this.targetLine.graphics.endStroke();
+
 		// Components
 		this.physics = new PhysicsBody(this.ship);
 	}
 
 	update() {
-		this.setBounds(this.x,this.y,20,20)
+		super.update();
+		this.setBounds(this.x,this.y,40,40)
 		this.physics.addImpulse(
 			(this.moving.right - this.moving.left) * this.speed,
 			( this.moving.down / 2 - this.moving.up) * this.speed// - .2
@@ -58,8 +68,25 @@ class Player extends GameObject {
 	}
 
 	setCrosshairPos(x, y) {
-		this.crosshair.x = x;
-		this.crosshair.y = y;
+		this.crosshair.x = this.targetLine.endPoint.x = x;
+		this.crosshair.y = this.targetLine.endPoint.y = y;
+		var cannonPos = this.getActiveCannonPos();
+
+		this.targetLine.startPoint.x = cannonPos.x;
+		this.targetLine.startPoint.y = cannonPos.y;
+	}
+
+	getActiveCannonPos() {
+		var cannons = [
+			{x:-20,y:-20},
+			{x:-20,y:20},
+			{x:20,y:20},
+			{x:20,y:-20}
+		]
+		var ch = this.getCrosshairPos();
+		var angle = Math.atan2(ch.x,ch.y)+Math.PI;
+		var id = Math.floor((angle*cannons.length)/(2*Math.PI));
+		return cannons[id];
 	}
 
 	getCrosshairPos() {

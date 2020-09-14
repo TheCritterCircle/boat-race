@@ -3,9 +3,12 @@ class GameObject extends createjs.Container {
 		super();
 		this.x = x;
 		this.y = y;
+		console.log(this.constructor.name+" created")
 	}
 
-	update() {}
+	update() {
+		console.debug(this.constructor.name+" updated");
+	}
 
 	setPos(x, y) {
 		this.x = x;
@@ -17,6 +20,7 @@ class GameObject extends createjs.Container {
 	}
 
 	destroy() {
+		console.log(this.constructor.name+" destroyed")
 		this.parent.removeChild(this);
 	}
 }
