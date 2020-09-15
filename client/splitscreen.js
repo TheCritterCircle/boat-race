@@ -16,10 +16,12 @@ class SplitScreen {
 
 	setHeight(height) {
 		this.container.style.height = height + "px";
+		this.update()
 	}
 
 	setWidth(width) {
 		this.container.style.width = width + "px";
+		this.update()
 	}
 
 	setDirection(dir) {
