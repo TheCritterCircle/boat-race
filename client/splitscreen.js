@@ -45,6 +45,8 @@ class SplitScreen {
 		this.getCanvases().forEach(canvas=>{
 			delete canvas.removeAttribute("width");
 			delete canvas.removeAttribute("height");
+			delete canvas.style.width;
+			delete canvas.style.height;
 			canvas.style.flex = "1 0 " + percent;
 			setTimeout(()=>{
 				canvas.width = canvas.getBoundingClientRect().width;
