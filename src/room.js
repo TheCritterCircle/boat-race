@@ -1,13 +1,14 @@
 class Room extends createjs.Container {
 	constructor(game) {
 		super();
+		this.game = game;
 		this.background = new createjs.Bitmap("media/background.png");
 		this.addChild(this.background);
 
 		//Properies
 		this.size = {w:1920,h:5550};
 		//this.setBounds(x,y,width,height);
-		var screen = game.getSize();
+		var screen = this.game.getSize();
 		this.startY = this.size.h-screen.h/2;
 		this.ships = {}
 
@@ -19,15 +20,15 @@ class Room extends createjs.Container {
 		if(ret) {
 			return this[action].bind(this);
 		}
-		game.on(action,this[action].bind(this));
+		this.game.on(action,this[action].bind(this));
 	}
 
 	update() {
 		Object.values(this.ships).forEach(ship => { ship.update() })
 		this.cannonballs.forEach(cb => { cb.update(Object.values(this.ships)) })
 
-		var screen = game.getSize();
-		var playerPos = game.player.getPos();
+		var screen = this.game.getSize();
+		var playerPos = this.game.player.getPos();
 		this.x = screen.w/2-playerPos.x;
 		this.y = screen.h/2-playerPos.y;
 
@@ -46,7 +47,7 @@ class Room extends createjs.Container {
 	}
 
 	reset() {
-		game.hud.starting.visible = true;
+		this.game.hud.starting.visible = true;
 		console.log("We be finding you a crew...")
 		this.player = undefined;
 		delete this.player;
@@ -57,7 +58,7 @@ class Room extends createjs.Container {
 
 	fire(player) {
 		console.log("fire",player);
-		var cannonball = new CannonBall(game,game.room.ships[player.id||player.name]);
+		var cannonball = new CannonBall(this.game,this.game.room.ships[player.id||player.name]);
 		this.addChild(cannonball);
 		this.cannonballs.push(cannonball);
 		if(this.cannonballs.length>10*Object.keys(this.ships).length) {
@@ -74,12 +75,20 @@ class Room extends createjs.Container {
 	}
 
 	joinShip(shipInfo) {
-		game.hud.starting.visible = false
+		this.game.hud.starting.visible = false
 		console.log("joinShip",shipInfo);
 		console.log("You are the",(shipInfo.mode==0?"Captain":"Cannon") + "!")
-		game.shipInfo.id = shipInfo.id;
-		game.shipInfo.name = shipInfo.name;
-		game.shipInfo.mode = shipInfo.mode;
+		this.game.shipInfo.id = shipInfo.id;
+		this.game.shipInfo.name = shipInfo.name;
+		this.game.shipInfo.mode = shipInfo.mode;
+
+		if(shipInfo.mode==0) {
+			//captain
+		this.stage.on("stagemousemove", this.bindEvent("mouseMove"));
+		this.stage.on("stagemousedown",this.bindEvent("mouseClick"));
+		} else {
+			//cannon
+		}
 
 		for(var i in shipInfo.ships) {
 			this.addShip(shipInfo.ships[i])
@@ -88,7 +97,7 @@ class Room extends createjs.Container {
 
 	moveShip(m) {
 		console.log("moveShip",m);
-		if(m.name == game.player.name&&game.player.mode ==0) return;
+		if(m.name == this.game.player.name&&this.game.player.mode ==0) return;
 		this.ships[m.id||m.name].updateCrumb(m);
 	}
 
@@ -105,19 +114,19 @@ class Room extends createjs.Container {
 	addShip(s) {
 		if(this.ships[s.id||s.name]) return;
 		console.log("addShip",s);
-		var ship = new Player(this, s.name);
+		var ship = new Player(this.game, s.name);
 		ship.updateCrumb(s);
 		this.ships[ship.id||ship.name] = ship;
 		this.addChild(ship);
-		if(!game.player && 
+		if(!this.game.player && 
 			(
-				ship.id && game.shipInfo.id==ship.id
-			||	ship.name && game.shipInfo.name==ship.name
+				ship.id && this.game.shipInfo.id==ship.id
+			||	ship.name && this.game.shipInfo.name==ship.name
 			)) {
-			ship.id = game.shipInfo.id;
-			ship.mode = game.shipInfo.mode;
-			console.log(game.shipInfo.mode==0?(ship.cannon + ": Aye Aye Captain!"):(ship.captain + ": Ahoy Mateys!"))
-			game.player=ship;
+			ship.id = this.game.shipInfo.id;
+			ship.mode = this.game.shipInfo.mode;
+			console.log(this.game.shipInfo.mode==0?(ship.cannon + ": Aye Aye Captain!"):(ship.captain + ": Ahoy Mateys!"))
+			this.game.player=ship;
 		}
 	}
 

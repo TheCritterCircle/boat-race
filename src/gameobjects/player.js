@@ -49,13 +49,13 @@ class Player extends GameObject {
 
 	update() {
 		super.update();
-		this.setBounds(this.x,this.y,40,40)
+		this.setBounds(this.x,this.y, 50,50)
 		this.physics.addImpulse(
 			(this.moving.right - this.moving.left) * this.speed,
 			( this.moving.down / 2 - this.moving.up) * this.speed// - .2
 		);
-		if(this.mode>-1)this.screen[this.mode] = game.getScreenBounds();
-		//if(this.mode==1)this.setCrosshairPos(game.stage.mouseX,game.stage.mouseY);
+		if(this.mode>-1)this.screen[this.mode] = this.game.getScreenBounds();
+		//if(this.mode==1)this.setCrosshairPos(this.game.stage.mouseX,this.game.stage.mouseY);
 		this.physics.update();
 		this.y += this.ship.y;
 		this.x += this.ship.x;
@@ -64,7 +64,7 @@ class Player extends GameObject {
 	}
 
 	getPos() {
-		return this.ship.localToLocal(0,0,game.room);
+		return this.ship.localToLocal(0,0,this.game.room);
 	}
 
 	setCrosshairPos(x, y) {

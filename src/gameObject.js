@@ -1,6 +1,7 @@
 class GameObject extends createjs.Container {
 	constructor(game, x=0, y=0) {
 		super();
+		this.game = game;
 		this.x = x;
 		this.y = y;
 		console.log(this.constructor.name+" created")

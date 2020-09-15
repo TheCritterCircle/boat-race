@@ -1,6 +1,7 @@
 class UIMap extends createjs.Container {
 	constructor(game) {
 		super();
+		this.game = game;
 		this.nodes = new createjs.Container();
 		this.addChild(this.nodes);
 	}
@@ -15,18 +16,18 @@ class UIMap extends createjs.Container {
 
 
 	setScale(scale) {
-		this.scaleX = scale*game.getSize().h/game.room.size.h;
-		this.scaleY = scale*game.getSize().h/game.room.size.h;
+		this.scaleX = scale*this.game.getSize().h/this.game.room.size.h;
+		this.scaleY = scale*this.game.getSize().h/this.game.room.size.h;
 	}
 
 	setPos(x,y) {
-		this.x = x*(game.getSize().w-this.scaleX*game.room.size.w);
-		this.y = y*(game.getSize().h-this.scaleY*game.room.size.h);
+		this.x = x*(this.game.getSize().w-this.scaleX*this.game.room.size.w);
+		this.y = y*(this.game.getSize().h-this.scaleY*this.game.room.size.h);
 	}
 
 	update() {
 		this.nodes.removeAllChildren();
-		var ships = Object.values(game.room.ships).map(ship=>ship.getCrumb(true))
+		var ships = Object.values(this.game.room.ships).map(ship=>ship.getCrumb(true))
 		ships.forEach(ship=>{
 			this.mapPlayer(ship)
 		});

@@ -1,14 +1,8 @@
 class Game {
-	constructor(i, w, h) {
+	constructor(i) {
 		//Setup Stage
 		this.stage = new createjs.Stage(i);
-		this.stage.canvas.width = w;
-		this.stage.canvas.height = h;
 		//this.stage.canvas.style.cursor = "none";
-		
-		//Setup Game Loop
-		createjs.Ticker.setFPS(60);
-		createjs.Ticker.addEventListener("tick", this.update.bind(this));
 
 		//Setup Game Objects
 		this.room = new Room(this);
@@ -22,8 +16,6 @@ class Game {
 		//Setup Events
 		window.onkeydown = this.bindEvent("inputDown");
 		window.onkeyup = this.bindEvent("inputUp");
-		this.stage.on("stagemousemove", this.bindEvent("mouseMove"));
-		this.stage.on("stagemousedown",this.bindEvent("mouseClick"));
 	}
 
 	bindEvent(f) {
@@ -38,7 +30,7 @@ class Game {
 	}
 
 	getScreenBounds() {
-		var pos = game.room?game.room.globalToLocal(0,0):{x:0,y:0};
+		var pos = this.room?this.room.globalToLocal(0,0):{x:0,y:0};
 		return {
 			x:pos.x,
 			y:pos.y,
@@ -79,8 +71,8 @@ class Game {
 
 	//events
 	update(e) {
-		this.stage.canvas.width = window.innerWidth;
-		this.stage.canvas.height = window.innerHeight
+		// this.stage.canvas.width = this.stage.canvas.getBoundingClientRect().width;
+		// this.stage.canvas.height = this.stage.canvas.getBoundingClientRect().height;
 		this.player&&this.room.update();
 		this.hud.update();
 		this.stage.update();

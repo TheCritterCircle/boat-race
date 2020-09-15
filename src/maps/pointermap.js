@@ -4,10 +4,10 @@ class Pointermap extends UIMap {
 	}
 
 	mapPlayer(player) {
-		if(player.id==game.player.id) return;
+		if(player.id==this.game.player.id) return;
 		var margin = 30
-			, screenSize = game.getSize()
-			, screenPos = game.room.localToGlobal(player.x, player.y)
+			, screenSize = this.game.getSize()
+			, screenPos = this.game.room.localToGlobal(player.x, player.y)
 			, y = screenPos.y
 			, x = screenPos.x
 			, scale = 0;

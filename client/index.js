@@ -1,7 +1,29 @@
-var game = new Game("viewport", window.innerWidth, window.innerHeight);
+var splitscreen = new SplitScreen(document.body);
+
+var games = [];
+/*var game = new Game(splitscreen.createScreen());
 
 game.join(location.hostname=="localhost"?"http://localhost:3000":"https://tumble-boat-race.herokuapp.com")
-game.emit("joinGame",prompt("Username"));
+game.emit("joinGame",prompt("Username"));*/
+
+function createGame() {
+	var game = new Game(splitscreen.createScreen());
+	
+	game.join(location.hostname=="localhost"?"http://localhost:3000":"https://tumble-boat-race.herokuapp.com")
+	game.emit("joinGame",prompt("Username"));
+	games.push(game);
+
+}
+function update() {
+	// game.update();
+	games.forEach(g=>{g.update();})
+}
+
+createGame();
+		
+//Setup Game Loop
+createjs.Ticker.setFPS(60);
+createjs.Ticker.addEventListener("tick", update);
 
 // One Player Mode
 /*game.room.joinShip({
