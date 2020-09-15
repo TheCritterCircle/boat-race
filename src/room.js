@@ -82,14 +82,6 @@ class Room extends createjs.Container {
 		this.game.shipInfo.name = shipInfo.name;
 		this.game.shipInfo.mode = shipInfo.mode;
 
-		if(shipInfo.mode==0) {
-			//captain
-		this.stage.on("stagemousemove", this.bindEvent("mouseMove"));
-		this.stage.on("stagemousedown",this.bindEvent("mouseClick"));
-		} else {
-			//cannon
-		}
-
 		for(var i in shipInfo.ships) {
 			this.addShip(shipInfo.ships[i])
 		}

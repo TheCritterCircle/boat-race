@@ -14,8 +14,10 @@ class Game {
 		this.shipInfo = {};
 
 		//Setup Events
-		window.onkeydown = this.bindEvent("inputDown");
-		window.onkeyup = this.bindEvent("inputUp");
+		window.addEventListener("keydown",this.bindEvent("inputDown"));
+		window.addEventListener("keyup", this.bindEvent("inputUp"))
+		this.stage.on("stagemousemove", this.bindEvent("mouseMove"));
+		this.stage.on("stagemousedown",this.bindEvent("mouseClick"));
 	}
 
 	bindEvent(f) {

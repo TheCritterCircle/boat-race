@@ -39,7 +39,7 @@ class SplitScreen {
 			setTimeout(()=>{
 				canvas.width = canvas.getBoundingClientRect().width;
 				canvas.height = canvas.getBoundingClientRect().height;
-			},0)
+			},1000)
 			/**/
 		})
 	}
