@@ -14,6 +14,14 @@ class SplitScreen {
 		this.container.style["align-item"] = "stretch";
 	}
 
+	setHeight(height) {
+		this.container.style.height = height + "px";
+	}
+
+	setWidth(width) {
+		this.container.style.width = width + "px";
+	}
+
 	setDirection(dir) {
 		switch (dir||"vertical") {
 			case "horizontal":
