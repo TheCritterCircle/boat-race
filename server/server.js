@@ -1,17 +1,29 @@
 "use strict";
 
-const socketIo = require('socket.io');
+const socketIo = require('socket.io'),
+http = require('http'),
+express = require('express');
 
 class Server {
-	constructor(httpServer) {
+	constructor(port) {
+        
 		this.name = "server";
-		this.io = socketIo.listen(httpServer);
+		this.port = port;
+		
+		this.api = new API(this);
+		this.server = this.api.server;
+		this.io = socketIo.listen(this.server);
 		this.socket = this.io.sockets;
 		this.pending = undefined;
 		this.rooms = {};
 
 		this.io.on('connect',this.joinServer.bind(this));
 		console.log("Created Server " + this.name);
+		
+		
+		this.server.listen(port,function(){
+			console.log(`Starting server on port: ${port}`);
+		})
 	}
 
 	emit(...a) {
@@ -49,6 +61,49 @@ class Server {
 		}
 	}
 
+}
+
+class API {
+	constructor(server) {
+		this.app = express();
+		this.server = http.Server(this.app);
+		this.app.set('port',server.port);
+		
+		this.get("/",this.getServerInfo.bind(this));
+		this.get("/:room",this.getRoomInfo.bind(this));
+		this.get("/:room/:ship",this.getShipInfo.bind(this));
+		
+		console.log("Setup API");
+	}
+	
+	get(path,action) {
+		this.app.get(path,(req,res)=>res.json(action(req.params)));
+	}
+	
+	getServerInfo(p) {
+		return {
+			name:server.name,
+			port: server.port,
+			//rooms:server.rooms.map(,
+			pending: server.pending?server.pending.name:null,
+			rooms:Object.keys(server.rooms),
+			ships:Object.values(server.rooms).map(r=>Object.keys(r.ships)).flat(),
+			players:Object.values(server.rooms).map(r=>r.ships.map(s=>[s.captain,s.cannon])).flat()
+		};
+	}
+	
+	getRoomInfo({room}) {
+		room = server.rooms[room];
+		return {
+			name:room.name,
+			server: server.name,
+			ships:Object.keys(room.ships)
+		};
+	}
+	
+	getShipInfo({room,ship}){
+		return server.rooms[room].ships[ship].getCrumb();
+	}
 }
 
 class Room {
@@ -283,8 +338,8 @@ class Client {
 
 
 var server;
-function main(httpServer) {
-	server = new Server(httpServer);
+function main(port) {
+	server = new Server(port);
 }
 
 module.exports = main;
