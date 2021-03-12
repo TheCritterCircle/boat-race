@@ -70,6 +70,7 @@ class API {
 		this.app.set('port',server.port);
 		
 		this.get("/",this.getServerInfo.bind(this));
+		this.get("/player/",this.getRoomInfo.bind(this));
 		this.get("/:room",this.getRoomInfo.bind(this));
 		this.get("/:room/:ship",this.getShipInfo.bind(this));
 		
